@@ -20,6 +20,7 @@ export function operationsDemo(): OperationsData {
       email: "field@example.com",
       hire_date: "2025-03-01",
       base_salary: 9000,
+      profile_id: "user1",
     },
     {
       id: "e2",
@@ -33,6 +34,7 @@ export function operationsDemo(): OperationsData {
       email: "finance@example.com",
       hire_date: "2025-07-01",
       base_salary: 12000,
+      profile_id: "user2",
     },
     {
       id: "e3",
@@ -46,6 +48,7 @@ export function operationsDemo(): OperationsData {
       email: null,
       hire_date: "2026-01-01",
       base_salary: 8500,
+      profile_id: "user3",
     },
   ];
   const accounts = [
@@ -140,6 +143,7 @@ export function operationsDemo(): OperationsData {
   });
   return {
     ...emptyOperations,
+    tenantUsers: [{id:"demo",full_name:"أحمد محمود",role:"admin"},{id:"user1",full_name:"محمود علي",role:"supervisor"},{id:"user2",full_name:"سارة أحمد",role:"accountant"},{id:"user3",full_name:"حسن محمد",role:"storekeeper"}],
     employees,
     employeeDirectory: employees,
     accounts,
@@ -149,6 +153,7 @@ export function operationsDemo(): OperationsData {
     journalLines,
     trialBalance,
     installments: [
+      {id:"ins2",customer_contract_id:null,upstream_contract_id:"u1",party_id:"authority1",ref_no:"UP-INST-001",due_date:day(20),amount:39600,invoice_id:null},
       {
         id: "ins1",
         customer_contract_id: "c1",
@@ -304,6 +309,9 @@ export function operationsDemo(): OperationsData {
       },
     ],
     stockMoves: [
+      {id:"sm3",ref_no:"ST-IN-002",item_id:"it2",from_warehouse_id:null,to_warehouse_id:"wh1",quantity:24,unit_cost:180,kind:"receipt",asset_id:null,work_order_id:null,notes:"استلام بنر مطبوع",created_at:day(-5)+"T08:00:00Z",return_of:null},
+      {id:"sm4",ref_no:"ST-IN-003",item_id:"it3",from_warehouse_id:null,to_warehouse_id:"wh2",quantity:20,unit_cost:400,kind:"receipt",asset_id:null,work_order_id:null,notes:"استلام كشافات",created_at:day(-5)+"T08:00:00Z",return_of:null},
+      {id:"sm5",ref_no:"ST-OUT-002",item_id:"it3",from_warehouse_id:"wh2",to_warehouse_id:null,quantity:2,unit_cost:400,kind:"issue",asset_id:"a8",work_order_id:"w3",notes:"تركيب إضاءة الحملة",created_at:day(-2)+"T08:00:00Z",return_of:null},
       {
         id: "sm1",
         ref_no: "ST-IN-001",
@@ -336,6 +344,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     purchases: [
+      {id:"po2",ref_no:"PO-002",supplier_id:"supplier1",warehouse_id:"wh2",ordered_on:day(-8),expected_on:day(-5),status:"received",notes:"استلمت كشافات إضاءة الحملة"},
       {
         id: "po1",
         ref_no: "PO-001",
@@ -348,6 +357,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     purchaseLines: [
+      {id:"pl3",purchase_id:"po2",item_id:"it3",quantity:20,unit_cost:400},
       {
         id: "pl1",
         purchase_id: "po1",
@@ -364,6 +374,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     workOrders: [
+      {id:"w3",ref_no:"WO-003",asset_id:"a8",title:"تركيب خامة حملة آفاق وإضاءتها",description:"تركيب كشافين وفحص الإضاءة",assigned_employee_id:"e1",priority:"normal",status:"completed",due_date:day(-2),completed_at:day(-2)+"T14:00:00Z",resolution:"تم التركيب وفحص الإضاءة وتسليم الموقع"},
       {
         id: "w1",
         ref_no: "WO-001",
@@ -416,6 +427,7 @@ export function operationsDemo(): OperationsData {
       paid_on: i === 2 ? today : null,
     })),
     enquiries: [
+      {id:"lead2",full_name:"شركة النخبة — مثال",phone:"01100000000",email:"elite@example.com",message:"طلب حملة على طريق السويس لمدة شهرين",asset_code:"MD-0109",status:"contacted",notes:"تم التواصل لإعداد العرض",created_at:day(-2)+"T09:00:00Z"},
       {
         id: "lead1",
         full_name: "عميل تجريبي",
@@ -442,6 +454,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     audit: [
+      {id:"aud2",actor_id:"user1",table_name:"assets",record_id:"a8",operation:"ASSET_LOCATION",created_at:day(-2)+"T10:00:00Z",changes:{reason:"تأكيد نقطة التركيب الميداني",after:{latitude:30.051,longitude:31.458}}},
       {
         id: "aud1",
         actor_id: "demo",

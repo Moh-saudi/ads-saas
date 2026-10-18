@@ -62,6 +62,10 @@ export function demoData(): WorkspaceData {
     material: "حديد مجلفن",
     notes: null,
     public_visible: true,
+    status: i === 3 ? "maintenance" as const : "active" as const,
+    cost: i % 3 === 0 ? 60000 : 18000,
+    install_date: date(-180),
+    useful_life_months: 60,
   }));
   const parties = [
     {
@@ -83,10 +87,17 @@ export function demoData(): WorkspaceData {
       tax_no: null,
     },
   ];
+  const operations = operationsDemo();
+  operations.contractLines = assets.filter(a => a.monthly_price != null).map((a, i) => ({
+    id: `cl${i+1}`, contract_id: Number(a.id.slice(1)) < 8 ? "c1" : "c2",
+    asset_id: a.id, start_date: date(-15), end_date: a.lease_end!,
+    monthly_price: a.monthly_price!, status: "active",
+  }));
+  const contractTotal = (id: string) => operations.contractLines.filter(l => l.contract_id === id).reduce((sum,l) => sum + Math.round(l.monthly_price * ((Date.parse(l.end_date) - Date.parse(l.start_date)) / 86400000 + 1) / 30 * 100), 0) / 100;
   const revenue = assets.reduce((s, a) => s + (a.monthly_price || 0), 0),
     cost = assets.reduce((s, a) => s + a.monthly_cost, 0);
   return {
-    operations: operationsDemo(),
+    operations,
     brand: demoBrand,
     profile: { full_name: "أحمد محمود", role: "admin" },
     demo: true,
@@ -99,10 +110,12 @@ export function demoData(): WorkspaceData {
       monthly_cost: cost,
       net_margin: revenue - cost,
       expiring_soon: 4,
-      chain_conflicts: 0,
+      chain_conflicts: assets.filter(a => a.chain_conflict).length,
     },
     parties: [
       ...parties,
+      { id: "authority1", name: "جهاز المدينة — جهة تجريبية", type: "authority", phone: "01000000005", whatsapp: null, wa_opt_in: false, tax_no: null },
+      { id: "master1", name: "شركة الامتياز الإعلاني — مثال", type: "master_concessionaire", phone: "01000000006", whatsapp: null, wa_opt_in: false, tax_no: null },
       {
         id: "supplier1",
         name: "المورد التجريبي للمعدات",
@@ -119,18 +132,18 @@ export function demoData(): WorkspaceData {
         ref_no: "ADV-2026-001",
         customer_id: "p1",
         start_date: date(-60),
-        end_date: date(25),
+        end_date: date(27),
         status: "active",
-        total_value: 81000,
+        total_value: contractTotal("c1"),
       },
       {
         id: "c2",
         ref_no: "ADV-2026-002",
         customer_id: "p2",
         start_date: date(-15),
-        end_date: date(120),
+        end_date: date(117),
         status: "active",
-        total_value: 108000,
+        total_value: contractTotal("c2"),
       },
     ],
     modules: [
@@ -156,6 +169,8 @@ export function demoData(): WorkspaceData {
       { id: "t2", name: "لوحة طرق" },
     ],
     finance: [
+      { id:"f3",ref_no:"INV-002",direction:"receivable",party_id:"p2",amount:19500,paid:0,due_date:date(-10),status:"open" },
+      { id:"f4",ref_no:"SUP-001",direction:"payable",party_id:"supplier1",amount:8000,paid:0,due_date:date(15),status:"open" },
       {
         id: "f1",
         ref_no: "INV-001",
@@ -170,22 +185,14 @@ export function demoData(): WorkspaceData {
         id: "f2",
         ref_no: "PAY-001",
         direction: "payable",
-        party_id: "",
+        party_id: "authority1",
         amount: 36000,
         paid: 36000,
         due_date: date(-2),
         status: "paid",
       },
     ],
-    licenses: [
-      {
-        id: "l1",
-        asset_id: "a0",
-        ref_no: "LIC-101",
-        issuer: "جهاز المدينة",
-        expires_on: date(30),
-      },
-    ],
+    licenses: assets.map((a,i) => ({ id:`l${i+1}`, asset_id:a.id, ref_no:`LIC-${101+i}`, issuer:i%3===2?"جهة الشروق — مثال":"جهة القاهرة الجديدة — مثال", expires_on:date(i===0?30:240) })),
     upstream: [
       {
         id: "u1",

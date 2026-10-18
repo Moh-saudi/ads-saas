@@ -8,7 +8,8 @@
     "db:new": "supabase migration new",
     "db:bundle": "node scripts/build-supabase-setup.mjs",
     "test:db": "node scripts/test-database.mjs",
-    "test:live": "node scripts/verify-live.mjs"
+    "test:live": "node scripts/verify-live.mjs",
+    "test:demo": "node scripts/test-demo-data.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.10",
