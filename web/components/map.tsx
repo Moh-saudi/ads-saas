@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { parseCoordinates } from "@/lib/coordinates.mjs";
 import type { Asset } from "@/lib/types";
 import "leaflet/dist/leaflet.css";
 export function AssetMap({
@@ -19,18 +20,16 @@ export function AssetMap({
         [30.045, 31.47],
         11,
       );
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map);
       const points: import("leaflet").LatLngTuple[] = [];
       for (const a of assets) {
-        if (a.latitude == null || a.longitude == null) continue;
-        const pt: import("leaflet").LatLngTuple = [
-          Number(a.latitude),
-          Number(a.longitude),
-        ];
+        const point = parseCoordinates(a.latitude, a.longitude);
+        if (!point) continue;
+        const pt: import("leaflet").LatLngTuple = [point.latitude, point.longitude];
         points.push(pt);
         const color = a.live_status === "retired" ? "#7b8597" :
           a.live_status === "vacant"

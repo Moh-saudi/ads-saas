@@ -1,4 +1,5 @@
 import "server-only";
+import { parseCoordinates } from "./coordinates.mjs";
 import type { requireContext } from "./data";
 type Context = Awaited<ReturnType<typeof requireContext>>;
 export const operationModules: Record<string, string> = {
@@ -26,6 +27,7 @@ export const operationModules: Record<string, string> = {
   reminders_queue: "whatsapp",
   contract_cancel: "customer_contracts",
   asset_update: "assets",
+  asset_location: "assets",
 };
 Object.assign(operationModules, {
   adjustment: "cashbook",
@@ -45,6 +47,11 @@ export async function operationMutation(
     },
     opt = (k: string) => s(k) || null;
   switch (kind) {
+    case "asset_location": {
+      const point = parseCoordinates(s("latitude"), s("longitude"));
+      if (!point) throw new Error("INVALID_COORDINATES");
+      return db.rpc("set_asset_location", { p_id: s("id"), p_latitude: point.latitude, p_longitude: point.longitude, p_reason: s("reason") });
+    }
     case "adjustment": {
       const lines = JSON.parse(s("journal_lines") || "[]");
       return db.rpc("create_adjustment_journal", {

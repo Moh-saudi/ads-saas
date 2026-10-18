@@ -1,4 +1,6 @@
 "use client";
+import { AssetPhotos } from "./asset-photos";
+import { AssetLocation } from "./asset-location";
 import { MapPin } from "lucide-react";
 import type { Asset, WorkspaceData } from "@/lib/types";
 import { statuses } from "@/lib/types";
@@ -22,6 +24,8 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
     <h2>{a.street_name}</h2><p>{a.district_name}</p>
     <dl>{[
       ["نوع الأصل", a.type_name],
+      ["خط العرض", a.latitude == null ? "غير محدد" : Number(a.latitude).toFixed(7)],
+      ["خط الطول", a.longitude == null ? "غير محدد" : Number(a.longitude).toFixed(7)],
       ["الأبعاد", `${a.length_m || "—"} × ${a.width_m || "—"} م`],
       ["الأوجه / المعدن", `${a.faces} / ${a.material || "—"}`],
       ["الإيجار الشهري", money(a.monthly_price)],
@@ -36,6 +40,8 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
     {a.latitude != null && a.longitude != null && <a className="button secondary" target="_blank" rel="noreferrer"
       href={`https://www.openstreetmap.org/?mlat=${a.latitude}&mlon=${a.longitude}#map=17/${a.latitude}/${a.longitude}`}>
       <MapPin size={17}/>فتح الموقع على الخريطة</a>}
+    <AssetPhotos key={a.id} asset={a.id} canEdit={canEdit} demo={d.demo} />
+    {canEdit && <AssetLocation key={`${a.id}:${a.latitude}:${a.longitude}`} asset={a} demo={d.demo} />}
     {a.chain_conflict && <p className="notice danger">تعارض في تغطية العقد الصاعد. راجع السلسلة التعاقدية.</p>}
     {canEdit && <details className="asset-section"><summary>تعديل حالة الأصل وبيانات الاقتناء</summary>
       <DataForm kind="asset_update" demo={d.demo} label="حفظ تعديلات الأصل">
@@ -82,7 +88,7 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
       <GridTable columns={["المرجع", "التاريخ", "البيان", "النوع", "القيمة"]} rows={cash.map((r) => [r.ref_no, date(r.transaction_date), r.description, ({income:"إيراد",expense:"مصروف",transfer:"تحويل"} as Record<string,string>)[r.kind] || r.kind,egp(r.amount)])}/>
     </details>}
     {d.profile.role === "admin" && <details className="asset-section"><summary>سجل تعديلات الأصل · {audit.length}</summary>
-      <GridTable columns={["التاريخ", "الإجراء", "المستخدم"]} rows={audit.map((r) => [date(r.created_at), ({INSERT:"إنشاء",UPDATE:"تعديل",DELETE:"حذف"} as Record<string,string>)[r.operation] || r.operation, o.tenantUsers.find((u) => u.id === r.actor_id)?.full_name || "إجراء نظام"] )}/>
+      <GridTable columns={["التاريخ", "الإجراء", "المستخدم"]} rows={audit.map((r) => [date(r.created_at), ({INSERT:"إنشاء",UPDATE:"تعديل",DELETE:"حذف",ASSET_LOCATION:"تصحيح الموقع"} as Record<string,string>)[r.operation] || r.operation, o.tenantUsers.find((u) => u.id === r.actor_id)?.full_name || "إجراء نظام"] )}/>
     </details>}
   </div>;
 }

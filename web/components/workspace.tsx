@@ -40,7 +40,9 @@ import {
   Globe,
   ExternalLink,
 } from "lucide-react";
+import { LocationCoverage } from "./location-coverage";
 import { DataForm } from "./forms";
+import type { MapPoint } from "./location-picker";
 import { Operations, operationNavigation } from "./operations";
 import { Analytics } from "./analytics";
 import { ContractOperations } from "./contract-operations";
@@ -58,6 +60,10 @@ import {
 const AssetMap = dynamic(() => import("./map").then((m) => m.AssetMap), {
   ssr: false,
   loading: () => <div className="asset-map skeleton">جارٍ تحميل الخريطة…</div>,
+});
+const LocationPicker = dynamic(() => import("./location-picker").then((m) => m.LocationPicker), {
+  ssr: false,
+  loading: () => <p className="notice">جارٍ تحميل خريطة اختيار الموقع…</p>,
 });
 const number = (n: number | null | undefined) =>
   new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(
@@ -461,6 +467,7 @@ export function Workspace({
                       tone="green"
                     />
                   </div>
+                  <LocationCoverage assets={d.assets} />
                   <Analytics data={d} />
                   <div className="dashboard-middle">
                     <section className="card map-card">
@@ -625,6 +632,7 @@ export function Workspace({
                   </div>
                 </>
               )}
+              {section === "assets" && <LocationCoverage assets={d.assets} />}
               {section === "assets" && (
                 <section className="card">
                   <div className="toolbar">
@@ -1455,6 +1463,9 @@ function Select({
   );
 }
 function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
+  const [assetPoint, setAssetPoint] = useState<MapPoint | null>(null);
+  const clearAssetPoint = useCallback(() => setAssetPoint(null), []);
+  const assetCenter = d.assets.find((asset) => asset.latitude != null && asset.longitude != null);
   const actual = kind.startsWith("payment:") ? "payment" : kind;
   const invoice = d.finance.find((f) => f.id === kind.split(":")[1]);
   return (
@@ -1462,6 +1473,8 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       key={kind}
       kind={actual}
       demo={d.demo}
+      disabled={actual === "asset" && !assetPoint}
+      onSuccess={actual === "asset" ? clearAssetPoint : undefined}
       label={actual === "contract" ? "فحص التوفر وإنشاء العقد" : "حفظ البيانات"}
     >
       {actual === "party" && (
@@ -1497,6 +1510,8 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
           <Field label="كود الأصل" name="code" />
           <Select label="الشارع" name="street_id" rows={d.streets} />
           <Select label="نوع الأصل" name="type_id" rows={d.assetTypes} />
+          <LocationPicker value={assetPoint} onChange={setAssetPoint} center={assetCenter ? { latitude: Number(assetCenter.latitude), longitude: Number(assetCenter.longitude) } : undefined} />
+          <label>صورة أولية للأصل (اختياري)<input type="file" name="asset_photo" accept="image/png,image/jpeg,image/webp" /><small>حتى 2 ميجابايت. يمكنك رفع صور إضافية من بطاقة الأصل بعد حفظه؛ الصور خاصة بالشركة.</small></label>
           <div className="form-grid">
             <Field
               label="الطول (م)"
@@ -1520,20 +1535,6 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
               value="1"
             />
             <Field label="المعدن" name="material" required={false} />
-            <Field
-              label="خط العرض"
-              name="latitude"
-              type="number"
-              step="any"
-              required={false}
-            />
-            <Field
-              label="خط الطول"
-              name="longitude"
-              type="number"
-              step="any"
-              required={false}
-            />
           </div>
           <label className="check-label">
             <input type="checkbox" name="public_visible" />

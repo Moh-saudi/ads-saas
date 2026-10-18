@@ -42,12 +42,14 @@ export function PublicSite({brand:b,catalog,demo=false,content,areas=[]}:{brand:
     <section className="agency-section agency-places" id="places">
       <div className="agency-section-label"><span>02 / أماكننا</span><span dir="ltr">THE RIGHT PLACE TO BE.</span></div>
       <div className="agency-section-heading"><h2>كل مكان،<br/><em>فرصة جديدة.</em></h2><p>نطاقات عملنا نقطة البداية. نساعدك على الوصول للمساحة التي تناسب رسالتك، ونتحقق معك من التوفر والتفاصيل.</p></div>
-      <div className="agency-places-grid">{c.places.map((place,i)=><article key={`${place.name}-${i}`} className="agency-place-card">
-        <img src={place.image_url||agencyImages[i%3]} alt={place.image_url.startsWith("/media/agency/")?`تصور إبداعي لنطاق ${place.name}`:place.name} loading="lazy"/>
+      <div className="agency-places-grid">{c.places.map((place,i)=>{
+        const image=place.image_url||agencyImages[i%agencyImages.length];
+        return <article key={`${place.name}-${i}`} className="agency-place-card">
+        <img src={image} alt={image.startsWith("/media/agency/")?`تصور إبداعي لنطاق ${place.name}`:place.name} loading="lazy"/>
         <div className="agency-place-gradient"/><span className="agency-place-index" dir="ltr">0{i+1} / EXPLORE</span>
-        {(place.illustrative ?? (place.image_url||agencyImages[i%3]).startsWith("/media/agency/")) && <span className="agency-place-caption">صورة تصورية</span>}
+        {(place.illustrative ?? image.startsWith("/media/agency/")) && <span className="agency-place-caption">صورة تصورية</span>}
         <div className="agency-place-content"><span><MapPin size={15}/>نطاق عمل</span><h3>{place.name}</h3><p>{place.description}</p><a href={place.map_url||`https://www.openstreetmap.org/search?query=${encodeURIComponent(place.name+" مصر")}`} target="_blank" rel="noreferrer" aria-label={`استكشف ${place.name} على الخريطة`}><ArrowUpLeft size={22}/></a></div>
-      </article>)}</div>
+      </article>;})}</div>
       {!c.places.length && <div className="agency-empty"><MapPin size={30}/><p>نحدد معك النطاق المناسب لحملتك.</p><a href="#quote">تواصل لتخطيط المواقع <ArrowLeft size={18}/></a></div>}
     </section>
     <section className="agency-work-section" id="work"><div className="agency-section">

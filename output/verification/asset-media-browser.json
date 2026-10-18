@@ -1,0 +1,28 @@
+[
+  {
+    "width": 1440,
+    "passed": [
+      "geographic coverage shown",
+      "map-selected point and actual image File included in creation form",
+      "demo saving disabled",
+      "asset photo section present",
+      "existing asset location editor opens with its selected marker",
+      "reason required for correction",
+      "no horizontal overflow"
+    ],
+    "limitations": "demo fixtures only; tiles blocked; hosted Storage API not exercised"
+  },
+  {
+    "width": 390,
+    "passed": [
+      "geographic coverage shown",
+      "map-selected point and actual image File included in creation form",
+      "demo saving disabled",
+      "asset photo section present",
+      "existing asset location editor opens with its selected marker",
+      "reason required for correction",
+      "no horizontal overflow"
+    ],
+    "limitations": "demo fixtures only; tiles blocked; hosted Storage API not exercised"
+  }
+]

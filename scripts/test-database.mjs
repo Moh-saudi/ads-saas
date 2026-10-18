@@ -4,6 +4,8 @@ import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 import { postgis } from "@electric-sql/pglite-postgis";
 import { readFile, readdir } from "node:fs/promises";
 import assert from "node:assert/strict";
+import { coordinateGeometry, parseCoordinates } from "../web/lib/coordinates.mjs";
+import { testAssetMedia } from "./test-asset-media.mjs";
 import { testOperations } from "./test-operations.mjs";
 import { testWebsite } from "./test-website.mjs";
 const db = new PGlite({ extensions: { btree_gist, pgcrypto, postgis } });
@@ -399,6 +401,22 @@ try {
     upstream,
   });
   await testWebsite({db,sql,as,ok,rejects,t1,t2,admin,viewer,other});
+  await as(admin);
+  await ok("map selection rejects missing nonfinite and out-of-range coordinates", async () => {
+    for (const [latitude, longitude] of [["", ""], ["30", ""], ["", "31"], ["NaN", "31"], ["30", "Infinity"], [91, 31], [30, 181], [-91, 31], [30, -181]]) {
+      assert.equal(parseCoordinates(latitude, longitude), null);
+      assert.equal(coordinateGeometry(latitude, longitude), null);
+    }
+    assert.deepEqual(parseCoordinates("0", "0"), { latitude: 0, longitude: 0 });
+  });
+  await ok("map-selected coordinates persist as a longitude-first PostGIS point", async () => {
+    const geometry = coordinateGeometry("30.0123456", "31.1234567");
+    const result = await sql(`insert into assets(tenant_id,code,street_id,type_id,geom)
+      values($1,'MAP-PICKER-TEST',$2,$3,$4) returning st_y(geom) latitude,st_x(geom) longitude`, [t1, s1, ty1, geometry]);
+    assert.equal(result.rows[0].latitude, 30.0123456);
+    assert.equal(result.rows[0].longitude, 31.1234567);
+  });
+  await testAssetMedia({db,sql,as,ok,rejects,t1,t2,admin,viewer,manager,inspector,other,a1,a2});
   console.log(
     `\n${checks} database assertions passed. Auth and Storage platform schemas are test fixtures.`,
   );

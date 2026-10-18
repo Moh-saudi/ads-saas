@@ -1,20 +1,24 @@
 import type { ReactNode } from "react";
-import { Cairo, Tajawal, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import "./agency.css";
 import "./dashboard.css";
 import { Pwa } from "@/components/pwa";
-const cairo = Cairo({ subsets: ["arabic", "latin"], display: "swap" });
-const dashboardArabic = Tajawal({
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700", "800"],
+const tajawal = localFont({
+  src: [
+    { path: "./fonts/Tajawal-Regular.ttf", weight: "400" },
+    { path: "./fonts/Tajawal-Medium.ttf", weight: "500" },
+    { path: "./fonts/Tajawal-Bold.ttf", weight: "700" },
+    { path: "./fonts/Tajawal-ExtraBold.ttf", weight: "800" },
+  ],
   variable: "--font-dashboard-arabic",
   display: "swap",
 });
-const dashboardNumbers = Inter({
-  subsets: ["latin"],
+const dashboardNumbers = localFont({
+  src: "./fonts/Inter.ttf",
+  weight: "100 900",
   variable: "--font-dashboard-numbers",
-  // Let Arabic glyphs fall through to Tajawal rather than Inter's Arial fallback.
+  // Arabic glyphs fall through to Tajawal instead of an Arial fallback.
   adjustFontFallback: false,
   display: "swap",
 });
@@ -33,7 +37,7 @@ export const viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${cairo.className} ${dashboardArabic.variable} ${dashboardNumbers.variable}`}>
+      <body className={`${tajawal.className} ${tajawal.variable} ${dashboardNumbers.variable}`}>
         {children}
         <Pwa />
       </body>

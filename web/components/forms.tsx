@@ -8,20 +8,23 @@ export function DataForm({
   children,
   demo = false,
   disabled = false,
+  onSuccess,
   label = "حفظ البيانات",
 }: {
   kind: string;
   children: ReactNode;
   demo?: boolean;
   disabled?: boolean;
+  onSuccess?: () => void;
   label?: string;
 }) {
   const [state, action, pending] = useActionState(mutate, initial);
   const ref = useRef<HTMLFormElement>(null);
   useEffect(() => {
-    if (state.ok && !["brand", "modules", "asset_update", "website_config"].includes(kind))
+    if (state.ok && !["brand", "modules", "asset_update", "asset_location", "website_config"].includes(kind))
       ref.current?.reset();
-  }, [state, kind]);
+    if (state.ok) onSuccess?.();
+  }, [state, kind, onSuccess]);
   return (
     <form ref={ref} action={action} className="data-form">
       <input type="hidden" name="kind" value={kind} />

@@ -38,12 +38,13 @@ export function Analytics({
   const maximum = Math.max(1, ...series.flatMap((x) => [x.income, x.expense])),
     totalIncome = series.reduce((s, r) => s + r.income, 0),
     totalExpense = series.reduce((s, r) => s + r.expense, 0);
+  const streetDistrict = new Map(d.streets.map((street) => [street.id, street.district_id]));
   const districts = d.districts.map((x) => ({
     name: x.name,
-    total: d.assets.filter((a) => a.district_name === x.name && a.live_status !== "retired").length,
+    total: d.assets.filter((a) => streetDistrict.get(a.street_id) === x.id && a.live_status !== "retired").length,
     leased: d.assets.filter(
       (a) =>
-        a.district_name === x.name &&
+        streetDistrict.get(a.street_id) === x.id &&
         ["leased", "expiring"].includes(a.live_status),
     ).length,
   }));

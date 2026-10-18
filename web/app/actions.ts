@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireContext } from "@/lib/data";
+import { coordinateGeometry } from "@/lib/coordinates.mjs";
+import { prepareAssetPhoto, storeAssetPhoto } from "@/lib/asset-photo-storage";
 import { configured } from "@/lib/env";
 import { operationModules, operationMutation } from "@/lib/operation-actions";
 
@@ -38,6 +40,7 @@ function friendly(message: string, code?: string) {
   const messages: Record<string, string> = {
     INVALID_WEBSITE_URL: "استخدم رابط HTTPS صحيحًا للصورة أو الموقع أو الخريطة.",
     INVALID_WEBSITE_CONTENT: "راجع العناوين وبيانات أقسام الموقع والحد الأقصى لعدد العناصر.",
+    INVALID_COORDINATES: "اختر نقطة صحيحة على الخريطة قبل الحفظ.",
     ASSET_HAS_ACTIVE_LEASES:
       "لا يمكن استبعاد الأصل قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
     ASSET_RETIRED: "هذا الأصل مستبعد. أعد تفعيله من بطاقة الأصل قبل حجزه.",
@@ -143,21 +146,10 @@ export async function mutate(
         });
         break;
       case "asset": {
-        const lat = str("latitude"),
-          lng = str("longitude");
-        if (
-          (lat && !lng) ||
-          (!lat && lng) ||
-          (lat &&
-            (!Number.isFinite(Number(lat)) || Math.abs(Number(lat)) > 90)) ||
-          (lng &&
-            (!Number.isFinite(Number(lng)) || Math.abs(Number(lng)) > 180))
-        )
-          return {
-            ok: false,
-            message: "أدخل إحداثيات صحيحة: خط العرض وخط الطول معًا.",
-          };
-        result = await db.from("assets").insert({
+        const geometry = coordinateGeometry(str("latitude"), str("longitude"));
+        if (!geometry) return { ok: false, message: "اختر موقعًا صحيحًا على الخريطة قبل حفظ الأصل." };
+        const photo = await prepareAssetPhoto(form.get("asset_photo"));
+        const created = await db.from("assets").insert({
           tenant_id: brand.id,
           code: str("code"),
           street_id: str("street_id"),
@@ -166,14 +158,24 @@ export async function mutate(
           width_m: num("width_m") || null,
           faces: num("faces") || 1,
           material: str("material"),
-          geom: lat ? `SRID=4326;POINT(${Number(lng)} ${Number(lat)})` : null,
+          geom: geometry,
           public_visible: form.get("public_visible") === "on",
           cost: str("cost") ? num("cost") : null,
           install_date: str("install_date") || null,
           useful_life_months: str("useful_life_months")
             ? num("useful_life_months")
             : null,
-        });
+        }).select("id").single();
+        result = created;
+        if (!created.error && created.data && photo) {
+          let failed = false;
+          try { const upload = await storeAssetPhoto(db, brand.id, created.data.id, photo); failed = Boolean(upload.error); }
+          catch { failed = true; }
+          if (failed) {
+            revalidatePath("/", "layout");
+            return { ok: true, message: "تم إنشاء الأصل وحفظ موقعه، لكن تعذر رفع الصورة. افتح بطاقة الأصل وأعد رفع الصورة؛ لا تنشئ الأصل مرة أخرى." };
+          }
+        }
         break;
       }
       case "contract":
