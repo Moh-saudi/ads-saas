@@ -31,7 +31,7 @@ export function DataForm({
       {children}
       {demo && (
         <div className="notice">
-          نسخة تجريبية للعرض؛ الحفظ متاح بعد ربط Supabase.
+          عرض تدريبي ببيانات افتراضية؛ الحفظ معطّل هنا. استخدم حساب الشركة لحفظ البيانات الفعلية.
         </div>
       )}
       {state.message && (

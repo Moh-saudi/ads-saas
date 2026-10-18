@@ -1,0 +1,129 @@
+{
+  "frames": 218,
+  "chapters": [
+    {
+      "second": 0.0,
+      "title": "ابدأ من موقع الشركة"
+    },
+    {
+      "second": 5.4,
+      "title": "عن الشركة"
+    },
+    {
+      "second": 10.8,
+      "title": "المناطق والأماكن"
+    },
+    {
+      "second": 14.9,
+      "title": "الأعمال الإبداعية"
+    },
+    {
+      "second": 18.9,
+      "title": "الشركاء والعلامات"
+    },
+    {
+      "second": 24.3,
+      "title": "دليل المساحات الإعلانية"
+    },
+    {
+      "second": 28.4,
+      "title": "ابدأ التواصل واطلب عرض سعر"
+    },
+    {
+      "second": 33.8,
+      "title": "من الموقع إلى لوحة الإدارة"
+    },
+    {
+      "second": 37.8,
+      "title": "كتابة البريد وكلمة المرور"
+    },
+    {
+      "second": 45.9,
+      "title": "مساحة إدارة المشروع"
+    },
+    {
+      "second": 52.7,
+      "title": "1 | إضافة الجهة المالكة"
+    },
+    {
+      "second": 60.8,
+      "title": "2 | تعريف الشارع والمنطقة"
+    },
+    {
+      "second": 68.9,
+      "title": "3 | تسجيل اللوحة وتحديد موقعها"
+    },
+    {
+      "second": 86.4,
+      "title": "4 | تعبئة عقد حق الاستغلال"
+    },
+    {
+      "second": 98.6,
+      "title": "5 | بيانات تصريح اللوحة"
+    },
+    {
+      "second": 108.0,
+      "title": "6 | تعبئة عقد المعلن"
+    },
+    {
+      "second": 118.8,
+      "title": "7 | تسجيل دفعة على الفاتورة"
+    },
+    {
+      "second": 125.6,
+      "title": "الفاتورة النهائية بتنسيق A4"
+    },
+    {
+      "second": 135.0,
+      "title": "ابدأ تشغيل فريقك مع الدليل التفاعلي"
+    }
+  ],
+  "checks": [
+    "fictional password masked",
+    "demo login opens fixture workspace",
+    "demo form saving disabled",
+    "demo form saving disabled",
+    "map coordinates selected",
+    "demo form saving disabled",
+    "demo form saving disabled",
+    "demo form saving disabled",
+    "demo form saving disabled",
+    "demo form saving disabled",
+    "no live Supabase requests from browser"
+  ],
+  "tileSuccess": 27,
+  "tileFailures": 0,
+  "source": "Actual local demo UI. Fictional credentials; training forms filled but never saved. Original generated background music.",
+  "source_duration": 104.82000000000004,
+  "playback_time_scale": 1.35,
+  "encoded": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1600,
+        "height": 900,
+        "side_data_list": [
+          {}
+        ]
+      },
+      {
+        "codec_name": "aac",
+        "sample_rate": "44100",
+        "channels": 2
+      }
+    ],
+    "format": {
+      "duration": "141.707007",
+      "size": "7879633"
+    }
+  },
+  "full_decode_passed": true,
+  "audio": {
+    "origin": "Original synthesized instrumental generated for this walkthrough",
+    "mean_volume_db": -26.3,
+    "max_volume_db": -11.2,
+    "voiceover": false
+  }
+}
