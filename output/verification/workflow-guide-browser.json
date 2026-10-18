@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1440,
+    "steps": 10,
+    "passed": [
+      "step navigation",
+      "permission and license limitations visible",
+      "completion and reset",
+      "demo destination links",
+      "financial example",
+      "no horizontal overflow"
+    ]
+  },
+  {
+    "width": 390,
+    "steps": 10,
+    "passed": [
+      "step navigation",
+      "permission and license limitations visible",
+      "completion and reset",
+      "demo destination links",
+      "financial example",
+      "no horizontal overflow"
+    ]
+  }
+]

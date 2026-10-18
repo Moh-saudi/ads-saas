@@ -40,6 +40,7 @@ import {
   Globe,
   ExternalLink,
 } from "lucide-react";
+import { WorkflowGuide } from "./workflow-guide";
 import { LocationCoverage } from "./location-coverage";
 import { DataForm } from "./forms";
 import type { MapPoint } from "./location-picker";
@@ -81,6 +82,7 @@ const formatDate = (v: string | null) =>
       }).format(new Date(`${v}T12:00:00Z`))
     : "—";
 const navigation = [
+  { id: "guide", label: "دليل بدء التشغيل", icon: FileText, module: "guide" },
   {
     id: "dashboard",
     label: "نظرة عامة",
@@ -155,7 +157,7 @@ export function Workspace({
   const base = d.demo ? "/demo" : "/app";
   const nav = navigation.find((n) => n.id === section) || navigation[0];
   const enabled = (key: string) =>
-    key === "settings" ||
+    key === "guide" || key === "settings" ||
     d.modules.some((m) => m.module_key === key && m.enabled);
   const visibleNav = navigation.filter(
     (n) =>
@@ -432,6 +434,7 @@ export function Workspace({
             <Empty text="هذه الشاشة مخصصة لمدير النظام." />
           ) : (
             <>
+              {section === "guide" && <WorkflowGuide demo={d.demo} />}
               {(operationSections as readonly string[]).includes(section) && (
                 <Operations key={section} data={d} section={section} />
               )}

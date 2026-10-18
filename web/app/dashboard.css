@@ -236,3 +236,22 @@
 .location-coverage dt { font-size: 11px; color: #64748b; }
 .location-coverage dd { margin: 3px 0 0; color: #0b1744; font-size: 22px; font-weight: 700; }
 @media(max-width:760px) { .asset-photo-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .location-coverage { padding: 15px; } .location-coverage dl { gap: 7px; } .location-coverage dl > div { padding: 9px; } .location-coverage dt { font-size: 10px; } }
+
+/* Guided onboarding: independent from company records and write permissions. */
+.workflow-guide { display:grid; gap:24px; min-width:0; }
+.workflow-intro,.workflow-detail,.workflow-summary { padding:28px; background:#fff; border:1px solid var(--line,#dfe7ed); border-radius:18px; min-width:0; }
+.workflow-guide h2 { margin:10px 0 16px; font-size:25px; }
+.workflow-guide p,.workflow-guide li { line-height:1.95; overflow-wrap:anywhere; }
+.workflow-layout { display:grid; grid-template-columns:280px minmax(0,1fr); gap:22px; align-items:start; }
+.workflow-layout nav { display:grid; gap:8px; }
+.workflow-layout nav button { display:flex; gap:10px; align-items:center; text-align:start; padding:13px; border:1px solid #dfe7ed; background:white; border-radius:12px; font:inherit; cursor:pointer; color:#173349; }
+.workflow-layout nav button[aria-current] { background:#eaf6f1; border-color:#18866b; }
+.workflow-layout nav button span { flex-shrink:0; display:grid; place-items:center; width:28px; height:28px; background:#edf2f6; border-radius:50%; }
+.workflow-detail ol { padding-inline-start:24px; }
+.workflow-detail li { margin-bottom:12px; }
+.workflow-note { padding:16px; border-inline-start:3px solid #d2ae58; background:#fffaf0; }
+.workflow-actions,.workflow-progress { display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+.workflow-progress progress { flex:1; min-width:120px; accent-color:#18866b; }
+.workflow-guide a.button { white-space:normal; text-align:center; }
+@media(max-width:800px) { .workflow-layout { grid-template-columns:minmax(0,1fr); } .workflow-layout nav { grid-template-columns:repeat(2,minmax(0,1fr)); } .workflow-intro,.workflow-detail,.workflow-summary { padding:18px; } .workflow-guide h2 { font-size:21px; } }
+@media(max-width:420px) { .workflow-layout nav { grid-template-columns:minmax(0,1fr); } }

@@ -308,6 +308,7 @@ export const operationSections = [
   "audit",
 ] as const;
 export const allSections = [
+  "guide",
   "dashboard",
   "assets",
   "contracts",
