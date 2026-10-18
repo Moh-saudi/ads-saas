@@ -36,6 +36,8 @@ export async function logout() {
 
 function friendly(message: string, code?: string) {
   const messages: Record<string, string> = {
+    INVALID_WEBSITE_URL: "استخدم رابط HTTPS صحيحًا للصورة أو الموقع أو الخريطة.",
+    INVALID_WEBSITE_CONTENT: "راجع العناوين وبيانات أقسام الموقع والحد الأقصى لعدد العناصر.",
     ASSET_HAS_ACTIVE_LEASES:
       "لا يمكن استبعاد الأصل قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
     ASSET_RETIRED: "هذا الأصل مستبعد. أعد تفعيله من بطاقة الأصل قبل حجزه.",
@@ -123,6 +125,12 @@ export async function mutate(
       return { ok: true, message: "تم تنفيذ العملية وتسجيلها بنجاح." };
     }
     switch (kind) {
+      case "website_config": {
+        if(profile.role!=="admin")return {ok:false,message:"إدارة الموقع متاحة لمدير الشركة فقط."};
+        const content=JSON.parse(str("website_content")||"{}");
+        result=await db.from("tenant_website").upsert({tenant_id:brand.id,content},{onConflict:"tenant_id"});
+        break;
+      }
       case "party":
         result = await db.from("parties").insert({
           tenant_id: brand.id,

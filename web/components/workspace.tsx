@@ -46,6 +46,7 @@ import { Analytics } from "./analytics";
 import { ContractOperations } from "./contract-operations";
 import { ItemizedInvoiceFields } from "./invoice-fields";
 import { AssetRecord } from "./asset-record";
+import { WebsiteEditor } from "./website-editor";
 import { operationSections } from "@/lib/operations-types";
 import { logout } from "@/app/actions";
 import {
@@ -1155,6 +1156,7 @@ export function Workspace({
                       </Link>
                     </section>
                   </div>
+                  <WebsiteEditor data={d}/>
                 </div>
               )}
             </>

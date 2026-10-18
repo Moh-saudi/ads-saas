@@ -31,7 +31,7 @@ try {
     const r = await anon.rpc("tenant_by_host", { h: "localhost" }); assert.ifError(r.error);
     assert.equal(r.data[0]?.id, tenant); assert.equal(p.data.role, "admin");
   });
-  const tables = ["tenant_modules","parties","customer_contracts","upstream_contracts","streets","districts","governorates","asset_types","licenses","v_kpis","v_asset_register","v_invoice_balances",
+  const tables = ["tenant_website","tenant_modules","parties","customer_contracts","upstream_contracts","streets","districts","governorates","asset_types","licenses","v_kpis","v_asset_register","v_invoice_balances",
     "employees","attendance","leave_requests","warehouses","inventory_items","v_stock_balances","stock_movements","purchase_orders","purchase_lines","work_orders","inspections","payroll_items","ledger_accounts","v_cash_balances","cash_transactions","journal_entries","journal_lines","v_trial_balance","v_monthly_cashflow","enquiries","audit_events","whatsapp_outbox","asset_tags","contract_installments","contract_lines"];
   // Small batches keep verification from flooding the hosted API.
   for (let i = 0; i < tables.length; i += 5) await Promise.all(tables.slice(i,i+5).map(table => check(`Data API / ${table}`, async () => {
@@ -40,8 +40,10 @@ try {
   })));
   for (const name of ["employee_directory","tenant_user_directory"]) await check(`RPC / ${name}`, async () => { const r = await user.rpc(name); assert.ifError(r.error); });
   await check("public catalog remains accessible", async () => { const r = await anon.rpc("public_catalog", { h:"localhost" }); assert.ifError(r.error); });
+  await check("public website content is host-scoped and returns work areas", async () => {const r=await anon.rpc("public_website",{p_host:"localhost"});assert.ifError(r.error);assert.ok(Array.isArray(r.data.areas));assert.ok(r.data.content);});
+  await check("production hostname maps to the configured company", async()=>{const r=await anon.rpc("tenant_by_host",{h:"ads-kappa-one.vercel.app"});assert.ifError(r.error);assert.equal(r.data[0]?.id,tenant);});
   await check("unknown domain does not resolve a company", async () => { const r = await anon.rpc("tenant_by_host",{h:"unverified.invalid"}); assert.ifError(r.error); assert.equal(r.data.length,0); });
-  for (const table of ["assets","v_asset_register","employees","enquiries","journal_lines"]) await check(`anonymous private data denied / ${table}`, async () => {
+  for (const table of ["tenant_website","assets","v_asset_register","employees","enquiries","journal_lines"]) await check(`anonymous private data denied / ${table}`, async () => {
     const r = await anon.from(table).select("*").limit(1); assert.ok(r.error, "Anonymous access must be denied explicitly");
   });
   const report = { verified_at:new Date().toISOString(), project:new URL(url).hostname, mode:"read-only API verification; no business records created", passed:checks.length, checks };

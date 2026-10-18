@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { PanelsTopLeft, ArrowUpLeft } from "lucide-react";
+import { redirect } from "next/navigation";
+import { getBrand } from "@/lib/data";
+import { configured } from "@/lib/env";
 export const metadata = { title: "إعداد المنصة" };
-export default function Page() {
+export default async function Page() {
+  if(configured && await getBrand())redirect("/");
   return (
     <main className="setup-page card">
       <PanelsTopLeft size={42} color="#d4a017" />

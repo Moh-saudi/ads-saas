@@ -8,6 +8,7 @@ import { lookupBrand } from "./brand-lookup";
 import { normalizeHost } from "./host";
 import { emptyKpis, type Brand, type WorkspaceData } from "./types";
 import { loadOperations, readTenantRows } from "./operations-data";
+import type { WebsiteContent } from "./website-types";
 
 export const getBrand = cache(async (): Promise<Brand | null> => {
   if (!configured) return null;
@@ -51,6 +52,7 @@ export async function loadWorkspace(): Promise<WorkspaceData> {
     finance,
     licenses,
     upstream,
+    websiteRows,
   ] = await Promise.all([
     loadOperations(db, brand.id),
     db.from("v_kpis").select("*").eq("tenant_id", brand.id).maybeSingle(),
@@ -117,6 +119,7 @@ export async function loadWorkspace(): Promise<WorkspaceData> {
       "upstream_contracts",
       brand.id,
     ),
+    readTenantRows<{content:WebsiteContent}>(db,"tenant_website",brand.id,"content","tenant_id"),
   ]);
   if (kpiResult.error)
     throw new Error(`تعذر تحميل المؤشرات: ${kpiResult.error.message}`);
@@ -138,5 +141,6 @@ export async function loadWorkspace(): Promise<WorkspaceData> {
     finance: finance || [],
     licenses: licenses || [],
     upstream: upstream || [],
+    website: websiteRows[0]?.content,
   } as WorkspaceData;
 }

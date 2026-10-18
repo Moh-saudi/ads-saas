@@ -7,6 +7,7 @@ export default function Page() {
     <PublicSite
       brand={d.brand}
       demo
+      areas={d.districts.map((area)=>area.name)}
       catalog={d.assets
         .slice(0, 6)
         .map((a) => ({

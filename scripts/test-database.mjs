@@ -5,6 +5,7 @@ import { postgis } from "@electric-sql/pglite-postgis";
 import { readFile, readdir } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { testOperations } from "./test-operations.mjs";
+import { testWebsite } from "./test-website.mjs";
 const db = new PGlite({ extensions: { btree_gist, pgcrypto, postgis } });
 let checks = 0;
 const sql = (s, args = []) => db.query(s, args);
@@ -397,6 +398,7 @@ try {
     p1,
     upstream,
   });
+  await testWebsite({db,sql,as,ok,rejects,t1,t2,admin,viewer,other});
   console.log(
     `\n${checks} database assertions passed. Auth and Storage platform schemas are test fixtures.`,
   );

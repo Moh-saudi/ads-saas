@@ -1,4 +1,5 @@
 import type { OperationsData } from "./operations-types";
+import type { WebsiteContent } from "./website-types";
 export type Brand = {
   id: string;
   name: string;
@@ -94,6 +95,7 @@ export type Upstream = {
   status: string;
 };
 export type WorkspaceData = {
+  website?: Partial<WebsiteContent>;
   operations: OperationsData;
   brand: Brand;
   profile: { full_name: string; role: string };

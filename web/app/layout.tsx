@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Cairo } from "next/font/google";
 import "./globals.css";
+import "./agency.css";
 import { Pwa } from "@/components/pwa";
 const cairo = Cairo({ subsets: ["arabic", "latin"], display: "swap" });
 export const metadata = {

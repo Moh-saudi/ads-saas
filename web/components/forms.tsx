@@ -7,17 +7,19 @@ export function DataForm({
   kind,
   children,
   demo = false,
+  disabled = false,
   label = "حفظ البيانات",
 }: {
   kind: string;
   children: ReactNode;
   demo?: boolean;
+  disabled?: boolean;
   label?: string;
 }) {
   const [state, action, pending] = useActionState(mutate, initial);
   const ref = useRef<HTMLFormElement>(null);
   useEffect(() => {
-    if (state.ok && !["brand", "modules", "asset_update"].includes(kind))
+    if (state.ok && !["brand", "modules", "asset_update", "website_config"].includes(kind))
       ref.current?.reset();
   }, [state, kind]);
   return (
@@ -40,7 +42,7 @@ export function DataForm({
       <button
         className="button primary"
         type="submit"
-        disabled={pending || demo}
+        disabled={pending || demo || disabled}
       >
         {pending ? <LoaderCircle size={18} className="spin" /> : null}
         {pending ? "جارٍ الحفظ…" : label}

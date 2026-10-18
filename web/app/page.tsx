@@ -30,7 +30,9 @@ export default async function Home() {
     );
   const db = await createClient();
   const h = normalizeHost((await headers()).get("host") || "");
-  const { data, error } = await db.rpc("public_catalog", { h });
-  if (error) throw new Error("تعذر تحميل دليل المواقع.");
-  return <PublicSite brand={brand} catalog={data || []} />;
+  const [catalog,website]=await Promise.all([
+    db.rpc("public_catalog",{h}),db.rpc("public_website",{p_host:h}),
+  ]);
+  if(catalog.error || website.error)throw new Error("تعذر تحميل موقع الشركة. أعد المحاولة بعد قليل.");
+  return <PublicSite brand={brand} catalog={catalog.data||[]} content={website.data?.content} areas={website.data?.areas||[]}/>;
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useActionState, useEffect, useRef } from "react";
 import { requestQuote } from "@/app/enquiry-action";
-export function EnquiryForm({ demo = false }: { demo?: boolean }) {
+export function EnquiryForm({ demo = false,assetCode="" }: { demo?: boolean;assetCode?:string }) {
   const [state, action, pending] = useActionState(requestQuote, {
     ok: false,
     message: "",
@@ -35,7 +35,7 @@ export function EnquiryForm({ demo = false }: { demo?: boolean }) {
         </label>
         <label>
           كود الموقع المطلوب (اختياري)
-          <input name="asset_code" maxLength={80} />
+          <input name="asset_code" maxLength={80} defaultValue={assetCode} key={assetCode}/>
         </label>
       </div>
       <label>
