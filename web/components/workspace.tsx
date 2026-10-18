@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import {
+  Suspense,
   useMemo,
   useState,
   useCallback,
@@ -40,6 +41,7 @@ import {
   Globe,
   ExternalLink,
 } from "lucide-react";
+import { GuidedTour } from "./guided-tour";
 import { WorkflowGuide } from "./workflow-guide";
 import { LocationCoverage } from "./location-coverage";
 import { DataForm } from "./forms";
@@ -390,7 +392,7 @@ export function Workspace({
                 </button>
               )}
               {canCreate && (
-                <button
+                <button data-tour-create
                   className="button primary"
                   onClick={() =>
                     setModal(
@@ -428,6 +430,7 @@ export function Workspace({
               )}
             </div>
           </div>
+          <Suspense fallback={null}><GuidedTour section={section} demo={d.demo} canOpen={!!canCreate && enabled(nav.module)} onOpen={setModal} /></Suspense>
           {!enabled(nav.module) ? (
             <Empty text="هذه الوحدة غير مفعّلة. يمكن لمدير الشركة تفعيلها من الإعدادات." />
           ) : section === "settings" && d.profile.role !== "admin" ? (

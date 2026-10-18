@@ -255,3 +255,12 @@
 .workflow-guide a.button { white-space:normal; text-align:center; }
 @media(max-width:800px) { .workflow-layout { grid-template-columns:minmax(0,1fr); } .workflow-layout nav { grid-template-columns:repeat(2,minmax(0,1fr)); } .workflow-intro,.workflow-detail,.workflow-summary { padding:18px; } .workflow-guide h2 { font-size:21px; } }
 @media(max-width:420px) { .workflow-layout nav { grid-template-columns:minmax(0,1fr); } }
+
+.guided-tour { padding:22px; margin:0 0 24px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:20px; border:2px solid #17866a; border-radius:18px; background:#f0faf6; color:#173349; }
+.guided-tour h2 { font-size:21px; margin:8px 0; }
+.guided-tour p { line-height:1.9; margin:10px 0; }
+.guided-tour small { display:block; line-height:1.8; }
+.tour-controls { display:flex; max-width:290px; gap:9px; align-items:center; flex-wrap:wrap; }
+.tour-controls a,.tour-controls button { white-space:normal; text-align:center; }
+.tour-highlight { outline:3px solid #d2ae58; outline-offset:5px; }
+@media(max-width:800px) { .guided-tour { grid-template-columns:minmax(0,1fr); padding:16px; } .tour-controls { max-width:none; } }
