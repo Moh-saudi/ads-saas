@@ -2,13 +2,13 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { X, Layers, Plus } from "lucide-react";
 export const fmt = (n: unknown) =>
-  new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(
+  new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(
     Number(n || 0),
   );
 export const egp = (n: unknown) => `${fmt(n)} ج.م`;
 export const date = (v: string | null | undefined) =>
   v
-    ? new Intl.DateTimeFormat("ar-EG", {
+    ? new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -17,7 +17,7 @@ export const date = (v: string | null | undefined) =>
     : "—";
 export const time = (v: string | null | undefined) =>
   v
-    ? new Intl.DateTimeFormat("ar-EG", {
+    ? new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
         hour: "2-digit",
         minute: "2-digit",
         timeZone: "Africa/Cairo",
@@ -181,6 +181,8 @@ export function Field({
       <input
         name={name}
         type={type}
+        lang={["number", "date", "datetime-local", "time"].includes(type) ? "en" : undefined}
+        dir={["number", "date", "datetime-local", "time", "tel", "email"].includes(type) ? "ltr" : undefined}
         defaultValue={value}
         required={required}
         min={min}

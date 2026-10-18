@@ -24,7 +24,7 @@ export function Analytics({
         );
         return {
           key,
-          label: new Intl.DateTimeFormat("ar-EG", {
+          label: new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
             month: "short",
             year: "2-digit",
             timeZone: "Africa/Cairo",

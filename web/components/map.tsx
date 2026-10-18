@@ -34,12 +34,12 @@ export function AssetMap({
         points.push(pt);
         const color = a.live_status === "retired" ? "#7b8597" :
           a.live_status === "vacant"
-            ? "#168a45"
+            ? "#00854a"
             : a.live_status === "expiring"
-              ? "#d4a017"
+              ? "#d6a529"
               : a.live_status === "maintenance"
                 ? "#c55f59"
-                : "#0b1f4d";
+                : "#0b1744";
         const marker = L.circleMarker(pt, {
           radius: 8,
           fillColor: color,

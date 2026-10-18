@@ -319,7 +319,7 @@ export function OperationForm({
           <Field name="period" label="شهر الراتب" type="month" />
           <label>
             الأساس المعتمد
-            <input
+            <input lang="en" dir="ltr"
               name="base_amount"
               type="number"
               min="0"
@@ -791,7 +791,7 @@ function PurchaseLines({ items }: { items: { id: string; name: string }[] }) {
           </label>
           <label>
             الكمية
-            <input
+            <input lang="en" dir="ltr"
               type="number"
               min="0.001"
               step="any"
@@ -802,7 +802,7 @@ function PurchaseLines({ items }: { items: { id: string; name: string }[] }) {
           </label>
           <label>
             سعر الوحدة
-            <input
+            <input lang="en" dir="ltr"
               type="number"
               min="0"
               step="0.0001"
@@ -1069,7 +1069,7 @@ function AdjustmentLines({ data: d }: { data: WorkspaceData }) {
           </label>
           <label>
             مدين
-            <input
+            <input lang="en" dir="ltr"
               type="number"
               min="0"
               step="0.01"
@@ -1079,7 +1079,7 @@ function AdjustmentLines({ data: d }: { data: WorkspaceData }) {
           </label>
           <label>
             دائن
-            <input
+            <input lang="en" dir="ltr"
               type="number"
               min="0"
               step="0.01"

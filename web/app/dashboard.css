@@ -1,0 +1,210 @@
+/* Mesk presentation reference: white surfaces, navy headings, green and gold.
+   Scoped to management screens; the public agency website keeps its own identity. */
+.workspace {
+  --navy: #0b1744;
+  --brand: #00854a;
+  --green: #00854a;
+  --gold: #d6a529;
+  --text: #142442;
+  --muted: #64748b;
+  --line: #e5ece9;
+  --bg: #f5f8f7;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-dashboard-numbers), var(--font-dashboard-arabic), sans-serif;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.workspace .sidebar {
+  background: #fff;
+  color: var(--navy);
+  border-left: 1px solid var(--line);
+  box-shadow: -6px 0 28px #102d1f03;
+  padding-top: 28px;
+}
+.workspace .brand-lockup { border-color: var(--line); padding-bottom: 24px; }
+.workspace .brand-mark {
+  color: var(--green);
+  background: #edf8f1;
+  border: 1px solid #d7ebdf;
+  border-radius: 14px;
+}
+.workspace .brand-lockup strong { font-size: 21px; letter-spacing: -.5px; }
+.workspace .brand-lockup small { font-size: 11px; color: #66756e; opacity: 1; }
+.workspace .workspace-label { color: #6c7c73; font-size: 11px; margin-top: 23px; }
+.workspace .workspace-label span {
+  color: #896911; border-color: #eedeb2; background: #fffbef;
+}
+.workspace .sidebar nav { scrollbar-color: #cfded5 transparent; }
+.workspace .sidebar .nav-link {
+  color: #4a5b6b;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 9px;
+  gap: 11px;
+  padding: 11px 13px;
+  margin-bottom: 4px;
+}
+.workspace .nav-link svg { color: #708178; opacity: 1; }
+.workspace .nav-link:hover { background: #f0f7f3; color: var(--green); }
+.workspace .nav-link.active {
+  color: white;
+  background: var(--green);
+  box-shadow: 0 5px 14px #00854a1c;
+  font-weight: 700;
+}
+.workspace .nav-link.active svg { color: white; }
+.workspace .nav-link.active:before { display: none; }
+.workspace .nav-count { background: #fff1db; color: #896315; }
+.workspace .tenant-isolation { color: #50665a; border-color: var(--line); font-size: 11px; }
+.workspace .tenant-isolation svg { color: var(--green); }
+.workspace .tenant-isolation small { color: #738379; font-size: 10px; }
+.workspace .public-site-link { color: var(--green); font-size: 12px; }
+.workspace .powered { color: #7c8982; font-size: 10px; }
+.workspace .powered b { color: #121717; }
+.workspace .topbar { border-color: var(--line); height: 78px; }
+.workspace .topbar-title { color: #7a8780; font-size: 12px; }
+.workspace .topbar-title strong { color: var(--navy); font-size: 12px; }
+.workspace .connection { color: #23704a; font-size: 11px; }
+.workspace .connection.demo { color: #896911; }
+.workspace .profile b { color: var(--navy); font-size: 12px; }
+.workspace .profile small { font-size: 11px; color: #6a7a71; }
+.workspace .avatar { color: var(--green); background: #eaf5ee; }
+.workspace .icon-button { color: #536a5e; }
+.workspace .main-content { padding-top: 30px; padding-bottom: 8px; }
+.workspace .page-heading { position: relative; padding-bottom: 23px; margin-bottom: 25px; }
+.workspace .page-heading:after {
+  content: ""; position: absolute; bottom: 0; right: 0; left: 0;
+  height: 2px; background: linear-gradient(to left, var(--green) 0 60px, #ead69c 60px, #ead69c33 65%, transparent);
+}
+.workspace .eyebrow { color: var(--green); font-size: 11px; font-weight: 700; margin-bottom: 7px; }
+.workspace h1 { color: var(--navy); font-size: clamp(25px, 2.2vw, 33px); font-weight: 800; letter-spacing: -.7px; }
+.workspace h2, .workspace h3 { color: var(--navy); }
+.workspace .page-heading p { color: #65766c; font-size: 13px; margin-top: 8px; }
+.workspace .date-label { color: #50665b; font-size: 12px; border-color: #dfe9e2; border-radius: 10px; }
+.workspace .demo-strip { font-size: 11px; color: #7e6521; background: #fffdf5; border-color: #eee3c2; }
+.workspace .button { font-size: 13px; border-radius: 9px; }
+.workspace .button.primary { background: var(--green); box-shadow: 0 4px 12px #00854a12; }
+.workspace .button.secondary { color: #3e5d4c; border-color: #dce7df; }
+.workspace :is(button, a):focus-visible { outline-color: var(--green); }
+.workspace :is(input, select, textarea):focus { outline-color: #b7dbc6; border-color: var(--green); }
+.workspace .card {
+  border-color: #e5ece7;
+  border-radius: 15px;
+  box-shadow: 0 4px 18px #163c2705;
+}
+.workspace .kpi { padding: 21px 21px 16px; position: relative; }
+.workspace .kpi:after {
+  content: ""; position: absolute; bottom: 0; right: 21px; left: 21px;
+  height: 3px; border-radius: 3px 3px 0 0; background: var(--green);
+}
+.workspace .kpi:has(.gold-bg):after { background: var(--gold); }
+.workspace .kpi:has(.navy-bg):after { background: var(--navy); }
+.workspace .kpi-top { font-size: 13px; color: #4f6258; font-weight: 500; }
+.workspace .kpi-icon { width: 39px; height: 39px; border-radius: 12px; }
+.workspace .navy-bg { color: var(--navy); background: #edf1f8; }
+.workspace .green-bg { color: var(--green); background: #eaf6ee; }
+.workspace .gold-bg { color: #a57a12; background: #fcf5e2; }
+.workspace .kpi-value { color: var(--navy); font-size: clamp(23px, 2.3vw, 34px); font-weight: 800; letter-spacing: -.9px; }
+.workspace .kpi-footer { font-size: 11px; color: #6d7b73; border-color: #edf2ef; }
+.workspace .card-head h2 { font-size: 17px; }
+.workspace .card-head p { color: #718177; font-size: 11px; }
+.workspace .card-head > a { color: var(--green); font-size: 12px; }
+.workspace .analytics-toolbar { margin-top: 12px; }
+.workspace .analytics-toolbar h2 { font-size: 19px; }
+.workspace .analytics-toolbar p { font-size: 12px; color: #65766c; }
+.workspace .analytics-toolbar select { font-size: 12px; color: #4f6658; border-color: #dce7df; }
+.workspace .ops-metric { border-top: 2px solid #d9e9de; }
+.workspace .ops-metric > span { font-size: 12px; color: #607368; }
+.workspace .ops-metric > strong { color: var(--navy); font-size: clamp(21px, 2vw, 28px); }
+.workspace .ops-metric > small { color: #6e7d75; font-size: 11px; }
+.workspace .bar.income { background: var(--green); }
+.workspace .bar.expense { background: var(--gold); }
+.workspace .chart-grid-lines { color: #6a7b70; font-size: 10px; }
+.workspace .bar-column > small { color: #627469; font-size: 10px; }
+.workspace .chart-tip { background: var(--navy); font-size: 11px; }
+.workspace .district-bars strong { color: #344f40; }
+.workspace .district-bars :is(span, div > div:first-child) { font-size: 12px; }
+.workspace .district-bars span { color: #66796e; }
+.workspace .analytics-ops > span { font-size: 12px; color: #617568; }
+.workspace .analytics-ops b { color: var(--navy); }
+.workspace .progress-track { background: #eaf1ec; }
+.workspace .progress-track i { background: var(--green); }
+.workspace .dot.navy { background: var(--navy); }
+.workspace .dot.green { background: var(--green); }
+.workspace .dot.gold { background: var(--gold); }
+.workspace .map-legend { font-size: 11px; color: #596e61; }
+.workspace .donut { background: conic-gradient(var(--green) 0 var(--pct), #edf2ee var(--pct) 360deg); }
+.workspace .donut > div { color: var(--navy); }
+.workspace .donut p { color: #65776b; font-size: 12px; }
+.workspace .occupancy-rows { font-size: 13px; color: #52685b; }
+.workspace .occupancy-rows b { color: var(--navy); }
+.workspace .vacancy-cost { font-size: 12px; background: #fafcf9; color: #67786d; }
+.workspace th { font-size: 12px; color: #5a7062; background: #f7faf8; border-color: #eaf0eb; }
+.workspace td { font-size: 13px; color: #41574a; border-color: #eef3ef; }
+.workspace .code { color: var(--navy); font-family: var(--font-dashboard-numbers), sans-serif; }
+.workspace .badge { font-size: 11px; }
+.workspace .badge.vacant { background: #eaf6ee; color: #187245; }
+.workspace .badge.leased { background: #edf1f8; color: #344b7a; }
+.workspace .badge.expiring { background: #fff7df; color: #8a6815; }
+.workspace .badge.maintenance { background: #fbefec; color: #a14e42; }
+.workspace .alert-item strong { font-size: 13px; color: var(--navy); }
+.workspace .alert-item small { font-size: 11px; color: #718075; }
+.workspace .chain-mini { background: #f2f7f3; font-size: 11px; }
+.workspace .subtle { color: #718075; font-size: 11px; }
+.workspace .workspace-footer { color: #748278; font-size: 11px; border-color: var(--line); }
+.workspace :is(.toolbar, .ops-toolbar) { color: #4a6253; }
+.workspace :is(.toolbar select, .search-box input, .data-form input, .data-form select, .data-form textarea) { font-size: 13px; }
+.workspace .data-form label { font-size: 13px; color: #3e5748; }
+.workspace :is(input[type="number"], input[type="date"], input[type="datetime-local"], input[type="time"], input[type="tel"], input[type="email"]) {
+  direction: ltr; text-align: right; font-variant-numeric: tabular-nums;
+}
+.workspace :is(.results-label, .table-note, .report-total, .ops-tabs button) { font-size: 12px; }
+.workspace .table-note { color: #697c6d; }
+.workspace .ops-tabs button.active { color: var(--green); border-color: var(--green); }
+.workspace .ops-dialog, .workspace .modal { color: var(--text); }
+.workspace .empty { color: #718075; }
+.workspace .empty svg { color: #a0b7a8; }
+.workspace .leaflet-container { font-family: var(--font-dashboard-numbers), var(--font-dashboard-arabic), sans-serif !important; }
+.invoice-document { font-variant-numeric: lining-nums tabular-nums; }
+@media (min-width: 1201px) {
+  .workspace .sidebar { width: 258px; }
+  .workspace .main-shell { margin-right: 258px; }
+}
+@media (max-width: 1200px) and (min-width: 761px) {
+  .workspace .sidebar { width: 236px; }
+  .workspace .main-shell { margin-right: 236px; }
+  .workspace .main-content { padding-left: 22px; padding-right: 22px; }
+  .workspace .kpi { padding: 17px; }
+  .workspace .kpi-top { font-size: 12px; }
+}
+@media (max-width: 1000px) {
+  .workspace .analytics-toolbar { flex-wrap: wrap; }
+  .workspace .kpi-value { font-size: 28px; }
+}
+@media (max-width: 760px) {
+  .workspace .topbar { height: 68px; }
+  .workspace .topbar-title strong { font-size: 12px; }
+  .workspace .main-content { padding-top: 22px; }
+  .workspace .page-heading { flex-wrap: wrap; padding-bottom: 20px; }
+  .workspace .page-heading h1 { font-size: 27px; }
+  .workspace .page-heading p { font-size: 12px; max-width: none; }
+  .workspace .eyebrow { font-size: 11px; }
+  .workspace .demo-strip { font-size: 10px; }
+  .workspace .kpi { padding: 14px; }
+  .workspace .kpi-top { font-size: 11px; gap: 5px; }
+  .workspace .kpi-icon { width: 28px; height: 28px; border-radius: 8px; }
+  .workspace .kpi-value { font-size: 24px; letter-spacing: -.8px; }
+  .workspace .kpi-footer { font-size: 10px; }
+  .workspace .ops-metric { padding: 16px; }
+  .workspace .ops-metric > strong { font-size: 22px; }
+  .workspace .analytics-toolbar h2 { font-size: 18px; }
+  .workspace .analytics-toolbar p { font-size: 11px; }
+  .workspace .bar-chart { margin-left: 16px; margin-right: 16px; padding-right: 38px; }
+  .workspace .bar-columns { gap: 7px; }
+  .workspace .bar-column > small { font-size: 9px; }
+  .workspace .heading-actions .button { font-size: 11px; }
+  .workspace .workspace-footer { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace *, .workspace *:before, .workspace *:after { transition: none !important; }
+}

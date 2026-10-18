@@ -44,9 +44,9 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
           <option value="active">نشط</option><option value="maintenance">صيانة</option><option value="retired">مستبعد</option>
         </select></label>
         <div className="form-grid">
-          <label>تكلفة الاقتناء (ج.م)<input type="number" name="cost" min="0" step="0.01" defaultValue={a.cost ?? ""}/></label>
-          <label>تاريخ التركيب<input type="date" name="install_date" defaultValue={a.install_date || ""}/></label>
-          <label>العمر الإنتاجي بالأشهر<input type="number" name="useful_life_months" min="1" step="1" defaultValue={a.useful_life_months ?? ""}/></label>
+          <label>تكلفة الاقتناء (ج.م)<input lang="en" dir="ltr" type="number" name="cost" min="0" step="0.01" defaultValue={a.cost ?? ""}/></label>
+          <label>تاريخ التركيب<input lang="en" dir="ltr" type="date" name="install_date" defaultValue={a.install_date || ""}/></label>
+          <label>العمر الإنتاجي بالأشهر<input lang="en" dir="ltr" type="number" name="useful_life_months" min="1" step="1" defaultValue={a.useful_life_months ?? ""}/></label>
         </div>
         <label>ملاحظات<textarea name="notes" maxLength={5000} defaultValue={a.notes || ""}/></label>
         <label className="check-label"><input type="checkbox" name="public_visible" defaultChecked={a.public_visible}/>إظهار الأصل في الموقع العام</label>

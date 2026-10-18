@@ -60,14 +60,14 @@ const AssetMap = dynamic(() => import("./map").then((m) => m.AssetMap), {
   loading: () => <div className="asset-map skeleton">جارٍ تحميل الخريطة…</div>,
 });
 const number = (n: number | null | undefined) =>
-  new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 1 }).format(
+  new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(
     Number(n || 0),
   );
 const money = (n: number | null | undefined) =>
   n == null ? "—" : `${number(n)} ج.م`;
 const formatDate = (v: string | null) =>
   v
-    ? new Intl.DateTimeFormat("ar-EG", {
+    ? new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -220,10 +220,7 @@ export function Workspace({
     URL.revokeObjectURL(url);
   }
   return (
-    <div
-      className="workspace"
-      style={{ "--brand": d.brand.primary_color } as CSSProperties}
-    >
+    <div className="workspace">
       {menu && (
         <button
           className="sidebar-backdrop"
@@ -258,6 +255,7 @@ export function Workspace({
               }}
               key={n.id}
               href={`${base}/${n.id}`}
+              aria-current={section === n.id ? "page" : undefined}
               className={`nav-link ${section === n.id ? "active" : ""}`}
             >
               <n.icon size={19} />
@@ -310,7 +308,7 @@ export function Workspace({
           <div className="topbar-actions">
             <span className={`connection ${d.demo ? "demo" : ""}`}>
               <i />
-              {d.demo ? "بيئة تجريبية" : "متصل بـ Supabase"}
+              {d.demo ? "بيئة تجريبية" : "مساحة العمل متصلة"}
             </span>
             <Link
               className="icon-button notification"
@@ -371,7 +369,7 @@ export function Workspace({
             <div className="heading-actions">
               {section === "dashboard" ? (
                 <span className="date-label">
-                  {new Intl.DateTimeFormat("ar-EG", {
+                  {new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
                     dateStyle: "long",
                     timeZone: "Africa/Cairo",
                   }).format(new Date())}
@@ -443,7 +441,7 @@ export function Workspace({
                     />
                     <Kpi
                       title="نسبة الإشغال"
-                      value={`${number(d.kpis.occupancy_pct)}٪`}
+                      value={`${number(d.kpis.occupancy_pct)}%`}
                       icon={<LayoutGrid size={21} />}
                       footer={`${number(Number(d.kpis.total_assets) - Number(d.kpis.leased))} أصل غير مؤجر`}
                       tone="green"
@@ -511,7 +509,7 @@ export function Workspace({
                         <div>
                           <strong>
                             {number(d.kpis.occupancy_pct)}
-                            <span>٪</span>
+                            <span>%</span>
                           </strong>
                           <small>نسبة الإشغال</small>
                         </div>
@@ -1408,6 +1406,8 @@ function Field({
       <input
         name={name}
         type={type}
+        lang={["number", "date", "datetime-local", "time"].includes(type) ? "en" : undefined}
+        dir={["number", "date", "datetime-local", "time", "tel", "email"].includes(type) ? "ltr" : undefined}
         defaultValue={value}
         required={required}
         min={min}

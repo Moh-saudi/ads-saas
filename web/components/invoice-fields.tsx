@@ -107,7 +107,7 @@ export function ItemizedInvoiceFields({ data: d }: { data: WorkspaceData }) {
             <div className="form-grid">
               <label>
                 الكمية
-                <input
+                <input lang="en" dir="ltr"
                   required
                   type="number"
                   min="0.001"
@@ -118,7 +118,7 @@ export function ItemizedInvoiceFields({ data: d }: { data: WorkspaceData }) {
               </label>
               <label>
                 سعر الوحدة
-                <input
+                <input lang="en" dir="ltr"
                   required
                   type="number"
                   min="0"
@@ -129,7 +129,7 @@ export function ItemizedInvoiceFields({ data: d }: { data: WorkspaceData }) {
               </label>
               <label>
                 خصم البند
-                <input
+                <input lang="en" dir="ltr"
                   type="number"
                   min="0"
                   step="0.01"
@@ -139,7 +139,7 @@ export function ItemizedInvoiceFields({ data: d }: { data: WorkspaceData }) {
               </label>
               <label>
                 الضريبة %
-                <input
+                <input lang="en" dir="ltr"
                   type="number"
                   min="0"
                   max="100"
