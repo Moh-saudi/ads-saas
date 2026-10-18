@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "logoLoaded": true,
+      "threeLines": true,
+      "noPageOverflow": true
+    },
+    {
+      "width": 390,
+      "logoLoaded": true,
+      "threeLines": true,
+      "noPageOverflow": true
+    }
+  ],
+  "printChecks": [
+    "actions hidden",
+    "static document flow",
+    "repeating table header",
+    "no screen table minimum width in print"
+  ],
+  "stress": "60 cloned rows for pagination only; not financial sample"
+}

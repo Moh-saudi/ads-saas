@@ -45,10 +45,10 @@ export function InvoiceDocument({
           طباعة / حفظ PDF
         </button>
       </div>
-      <article>
+      <article className="invoice-sheet">
         <header className="invoice-brand">
           <div>
-            {brand.logo_url && <img src={brand.logo_url} alt={brand.name} />}
+            <img className="invoice-logo" src={brand.logo_url || "/media/brand/mesk-vlab-logo.png"} alt={brand.logo_url ? brand.name : "Mesk | vlab Ai"} />
             <h1>{brand.name}</h1>
             <p>{brand.address}</p>
             <p dir="ltr">
@@ -56,6 +56,7 @@ export function InvoiceDocument({
             </p>
           </div>
           <div>
+            <span className="invoice-kicker">INVOICE · فاتورة</span>
             <h2>
               {i.direction === "receivable"
                 ? "فاتورة معلن"
@@ -74,8 +75,10 @@ export function InvoiceDocument({
           <p>هاتف: {party?.phone || "—"}</p>
           {party?.tax_no && <p>الرقم الضريبي: {party.tax_no}</p>}
         </section>
-        <div className="table-scroll">
-          <table>
+        <div className="invoice-table-wrap">
+          <p className="invoice-table-caption">تفاصيل البنود <span>جميع المبالغ بالجنيه المصري (EGP)</span></p>
+          <table className="invoice-items">
+            <colgroup><col style={{width:"31%"}} /><col style={{width:"7%"}} /><col style={{width:"13%"}} /><col style={{width:"10%"}} /><col style={{width:"13%"}} /><col style={{width:"12%"}} /><col style={{width:"14%"}} /></colgroup>
             <thead>
               <tr>
                 {[
@@ -107,15 +110,15 @@ export function InvoiceDocument({
                   ]
               ).map((l, n) => (
                 <tr key={n}>
-                  <td className="wrap-cell">{l.description}</td>
+                  <td className="invoice-description"><span className="invoice-row-number">{String(n+1).padStart(2,"0")}</span>{l.description}</td>
                   <td>{fmt(l.quantity)}</td>
-                  <td>{egp(l.unit_price)}</td>
-                  <td>{egp(l.discount)}</td>
-                  <td>{egp(l.net_amount)}</td>
+                  <td>{fmt(l.unit_price)}</td>
+                  <td>{fmt(l.discount)}</td>
+                  <td>{fmt(l.net_amount)}</td>
                   <td>
-                    {egp(l.tax_amount)} <small>({fmt(l.tax_rate)}٪)</small>
+                    {fmt(l.tax_amount)} <small>({fmt(l.tax_rate)}٪)</small>
                   </td>
-                  <td>{egp(Number(l.net_amount) + Number(l.tax_amount))}</td>
+                  <td>{fmt(Number(l.net_amount) + Number(l.tax_amount))}</td>
                 </tr>
               ))}
             </tbody>
@@ -144,7 +147,7 @@ export function InvoiceDocument({
           </div>
         </section>
         {i.payments.length > 0 && (
-          <section>
+          <section className="invoice-payments">
             <h3>الدفعات المسجلة</h3>
             <table>
               <thead>
@@ -166,6 +169,7 @@ export function InvoiceDocument({
             </table>
           </section>
         )}
+        <section className="invoice-signatures"><div>إعداد الفاتورة<span>الاسم / التوقيع</span></div><div>اعتماد الشركة<span>التوقيع / الختم</span></div></section>
         <footer>
           مستند حسابي صادر من نظام {brand.name}. لا يتضمن اعتمادًا من منظومة
           الفاتورة الإلكترونية أو إيصالًا ضريبيًا حكوميًا.

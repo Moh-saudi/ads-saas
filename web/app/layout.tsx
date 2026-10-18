@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./agency.css";
 import "./dashboard.css";
+import "./invoice.css";
 import { Pwa } from "@/components/pwa";
 const tajawal = localFont({
   src: [

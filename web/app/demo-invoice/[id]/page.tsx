@@ -13,14 +13,18 @@ export default async function Page({
   return (
     <InvoiceDocument
       demo
-      brand={d.brand}
+      brand={{...d.brand, name:"ميسك للإعلان", logo_url:"/media/brand/mesk-vlab-logo.png"}}
       party={d.parties.find((p) => p.id === f.party_id)}
       invoice={{
         ...f,
         issue_date: new Date().toISOString().slice(0, 10),
         net_total: f.amount,
         tax_total: 0,
-        lines: [
+        lines: id === "f1" ? [
+          {description:"إيجار لوحة إعلانية — التجمع الخامس\nحملة المعلن على الموقع MD-0105",quantity:1,unit_price:18000,discount:0,net_amount:18000,tax_rate:0,tax_amount:0},
+          {description:"طباعة وتجهيز خامة الإعلان",quantity:1,unit_price:6000,discount:0,net_amount:6000,tax_rate:0,tax_amount:0},
+          {description:"تركيب الخامة وفحص الموقع",quantity:1,unit_price:3000,discount:0,net_amount:3000,tax_rate:0,tax_amount:0},
+        ] : [
           {
             description: "تأجير مساحات إعلانية — بيانات تجريبية",
             quantity: 1,
