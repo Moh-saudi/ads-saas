@@ -14,6 +14,8 @@ const dashboardArabic = Tajawal({
 const dashboardNumbers = Inter({
   subsets: ["latin"],
   variable: "--font-dashboard-numbers",
+  // Let Arabic glyphs fall through to Tajawal rather than Inter's Arial fallback.
+  adjustFontFallback: false,
   display: "swap",
 });
 export const metadata = {
