@@ -1,0 +1,28 @@
+[
+  {
+    "width": 1440,
+    "assetRows": 18,
+    "mapMarkers": 18,
+    "distinctMarkerPaths": 18,
+    "loadedTiles": 0,
+    "selectionOpensAsset": true,
+    "geographyPresent": true,
+    "collected": 18000,
+    "outstandingReceivable": 28500,
+    "outstandingPayable": 8000,
+    "collectionAndAuthorityPaymentVisible": true
+  },
+  {
+    "width": 390,
+    "assetRows": 18,
+    "mapMarkers": 18,
+    "distinctMarkerPaths": 18,
+    "loadedTiles": 0,
+    "selectionOpensAsset": true,
+    "geographyPresent": true,
+    "collected": 18000,
+    "outstandingReceivable": 28500,
+    "outstandingPayable": 8000,
+    "collectionAndAuthorityPaymentVisible": true
+  }
+]

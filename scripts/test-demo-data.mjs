@@ -49,3 +49,11 @@ assert.equal(o.trialBalance.reduce((n,r)=>n+r.debit-r.credit,0),0);
 assert.equal(d.kpis.monthly_revenue,d.assets.reduce((n,a)=>n+(a.monthly_price||0),0));
 assert.equal(d.kpis.leased,o.contractLines.length);
 console.log(`Demo integrity passed: ${d.assets.length} assets, ${o.contractLines.length} contract lines, ${d.licenses.length} licenses, ${Object.keys(o).length} populated operations datasets; stock movements and balanced journals verified.`);
+
+const month=new Date().toISOString().slice(0,7);
+const current=o.cashTransactions.filter(t=>t.transaction_date.startsWith(month));
+assert.equal(current.filter(t=>t.kind==='receipt').reduce((s,t)=>s+t.amount,0),d.finance.filter(f=>f.direction==='receivable').reduce((s,f)=>s+f.paid,0));
+assert.equal(current.filter(t=>t.kind==='salary').reduce((s,t)=>s+t.amount,0),o.payroll.filter(p=>p.status==='paid').reduce((s,p)=>s+p.net_amount,0));
+assert.ok(current.some(t=>t.description.includes('PAY-001')&&t.amount===d.finance.find(f=>f.id==='f2').paid));
+for(const a of d.assets){assert.ok(Number.isFinite(a.latitude)&&Number.isFinite(a.longitude));if(a.district_name==='مدينة الشروق')assert.ok(a.longitude>31.6);}
+console.log('Current collections, paid payroll and authority payment reconcile; all 18 map coordinates validated.');

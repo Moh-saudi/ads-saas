@@ -94,10 +94,18 @@ export function operationsDemo(): OperationsData {
         asset_id: kind === "expense" ? "a0" : null,
         work_order_id: kind === "expense" ? "w1" : null,
       });
-    add("receipt", 76000 + (5 - m) * 6500, "gl4000", 1);
+    add("receipt", m === 0 ? 18000 : 76000 + (5 - m) * 6500, "gl4000", 1);
+    if (m === 0) cashTransactions[cashTransactions.length - 1].description = "تحصيل جزئي لفاتورة INV-001 — شركة آفاق";
     add("expense", 17000 + (m % 3) * 3200, "gl5000", 2);
-    add("salary", 29500, "gl5100", 3);
+    add("salary", m === 0 ? 8500 : 29500, "gl5100", 3);
+    if (m === 0) cashTransactions[cashTransactions.length - 1].description = "صرف راتب حسن محمد";
     add("expense", 3500 + (m % 2) * 1700, "gl5200", 4);
+    if (m === 0) {
+      add("payment", 36000, "gl5000", 5);
+      cashTransactions[cashTransactions.length - 1].description = "سداد استحقاق الجهة المالكة — PAY-001";
+      cashTransactions[cashTransactions.length - 1].asset_id = null;
+      cashTransactions[cashTransactions.length - 1].work_order_id = null;
+    }
   }
   const cashflow = Array.from(
     new Set(cashTransactions.map((t) => t.transaction_date.slice(0, 7))),
@@ -374,7 +382,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     workOrders: [
-      {id:"w3",ref_no:"WO-003",asset_id:"a8",title:"تركيب خامة حملة آفاق وإضاءتها",description:"تركيب كشافين وفحص الإضاءة",assigned_employee_id:"e1",priority:"normal",status:"completed",due_date:day(-2),completed_at:day(-2)+"T14:00:00Z",resolution:"تم التركيب وفحص الإضاءة وتسليم الموقع"},
+      {id:"w3",ref_no:"WO-003",asset_id:"a8",title:"تركيب خامة حملة النخبة وإضاءتها",description:"تركيب كشافين وفحص الإضاءة",assigned_employee_id:"e1",priority:"normal",status:"completed",due_date:day(-2),completed_at:day(-2)+"T14:00:00Z",resolution:"تم التركيب وفحص الإضاءة وتسليم الموقع"},
       {
         id: "w1",
         ref_no: "WO-001",
@@ -454,7 +462,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     audit: [
-      {id:"aud2",actor_id:"user1",table_name:"assets",record_id:"a8",operation:"ASSET_LOCATION",created_at:day(-2)+"T10:00:00Z",changes:{reason:"تأكيد نقطة التركيب الميداني",after:{latitude:30.051,longitude:31.458}}},
+      {id:"aud2",actor_id:"user1",table_name:"assets",record_id:"a8",operation:"ASSET_LOCATION",created_at:day(-2)+"T10:00:00Z",changes:{reason:"تأكيد نقطة التركيب الميداني",after:{latitude:30.131,longitude:31.633}}},
       {
         id: "aud1",
         actor_id: "demo",
