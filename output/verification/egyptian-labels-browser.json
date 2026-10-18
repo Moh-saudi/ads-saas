@@ -1,0 +1,137 @@
+{
+  "checks": [
+    {
+      "width": 1440,
+      "section": "upstream",
+      "title": "عقود استغلال المواقع",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "assets",
+      "title": "اللوحات والمواقع",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "customers",
+      "title": "العملاء والموردون والجهات",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "inspections",
+      "title": "المتابعة الميدانية",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "maintenance",
+      "title": "التركيب والصيانة",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "finance",
+      "title": "الفواتير والتحصيلات",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "cashbook",
+      "title": "الخزينة والبنوك",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "leads",
+      "title": "طلبات العملاء",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "audit",
+      "title": "سجل التعديلات",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "guide",
+      "title": "دليل الاستخدام",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "section": "licenses",
+      "title": "التراخيص والتصاريح",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "upstream",
+      "title": "عقود استغلال المواقع",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "assets",
+      "title": "اللوحات والمواقع",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "customers",
+      "title": "العملاء والموردون والجهات",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "inspections",
+      "title": "المتابعة الميدانية",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "maintenance",
+      "title": "التركيب والصيانة",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "finance",
+      "title": "الفواتير والتحصيلات",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "cashbook",
+      "title": "الخزينة والبنوك",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "leads",
+      "title": "طلبات العملاء",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "audit",
+      "title": "سجل التعديلات",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "guide",
+      "title": "دليل الاستخدام",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "section": "licenses",
+      "title": "التراخيص والتصاريح",
+      "passed": true
+    }
+  ],
+  "scope": "labels and explanatory copy only; demo fixtures; no writes"
+}

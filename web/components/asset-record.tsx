@@ -23,15 +23,15 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
     <span className={`badge ${a.live_status}`}>{statuses[a.live_status]}</span>
     <h2>{a.street_name}</h2><p>{a.district_name}</p>
     <dl>{[
-      ["نوع الأصل", a.type_name],
+      ["نوع اللوحة", a.type_name],
       ["خط العرض", a.latitude == null ? "غير محدد" : Number(a.latitude).toFixed(7)],
       ["خط الطول", a.longitude == null ? "غير محدد" : Number(a.longitude).toFixed(7)],
       ["الأبعاد", `${a.length_m || "—"} × ${a.width_m || "—"} م`],
       ["الأوجه / المعدن", `${a.faces} / ${a.material || "—"}`],
       ["الإيجار الشهري", money(a.monthly_price)],
       ["التكلفة الشهرية", money(a.monthly_cost)],
-      ["نهاية الإيجار", date(a.lease_end)], ["نهاية التغطية", date(a.coverage_end)],
-      ["تكلفة الاقتناء", money(a.cost)], ["تاريخ التركيب", date(a.install_date)],
+      ["نهاية الإيجار", date(a.lease_end)], ["انتهاء حق استغلال الموقع", date(a.coverage_end)],
+      ["تكلفة الشراء أو التصنيع", money(a.cost)], ["تاريخ التركيب", date(a.install_date)],
       ["العمر الإنتاجي بالأشهر", a.useful_life_months || "—"],
       ["الإهلاك الشهري التقديري", a.cost != null && a.useful_life_months ? money(a.cost / a.useful_life_months) : "—"],
       ["الظهور في الموقع", a.public_visible && a.live_status !== "retired" ? "منشور" : "غير منشور"],
@@ -42,20 +42,20 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
       <MapPin size={17}/>فتح الموقع على الخريطة</a>}
     <AssetPhotos key={a.id} asset={a.id} canEdit={canEdit} demo={d.demo} />
     {canEdit && <AssetLocation key={`${a.id}:${a.latitude}:${a.longitude}`} asset={a} demo={d.demo} />}
-    {a.chain_conflict && <p className="notice danger">تعارض في تغطية العقد الصاعد. راجع السلسلة التعاقدية.</p>}
-    {canEdit && <details className="asset-section"><summary>تعديل حالة الأصل وبيانات الاقتناء</summary>
-      <DataForm kind="asset_update" demo={d.demo} label="حفظ تعديلات الأصل">
+    {a.chain_conflict && <p className="notice danger">تعارض في تغطية عقد استغلال المواقع. راجع مدد العقود وصلاحية استغلال الموقع.</p>}
+    {canEdit && <details className="asset-section"><summary>تعديل حالة اللوحة وبيانات الشراء والتركيب</summary>
+      <DataForm kind="asset_update" demo={d.demo} label="حفظ تعديلات اللوحة">
         <input type="hidden" name="id" value={a.id}/>
-        <label>حالة الأصل<select name="status" defaultValue={a.status || (a.live_status === "maintenance" ? "maintenance" : a.live_status === "retired" ? "retired" : "active")}>
+        <label>حالة اللوحة<select name="status" defaultValue={a.status || (a.live_status === "maintenance" ? "maintenance" : a.live_status === "retired" ? "retired" : "active")}>
           <option value="active">نشط</option><option value="maintenance">صيانة</option><option value="retired">مستبعد</option>
         </select></label>
         <div className="form-grid">
-          <label>تكلفة الاقتناء (ج.م)<input lang="en" dir="ltr" type="number" name="cost" min="0" step="0.01" defaultValue={a.cost ?? ""}/></label>
+          <label>تكلفة الشراء أو التصنيع (ج.م)<input lang="en" dir="ltr" type="number" name="cost" min="0" step="0.01" defaultValue={a.cost ?? ""}/></label>
           <label>تاريخ التركيب<input lang="en" dir="ltr" type="date" name="install_date" defaultValue={a.install_date || ""}/></label>
           <label>العمر الإنتاجي بالأشهر<input lang="en" dir="ltr" type="number" name="useful_life_months" min="1" step="1" defaultValue={a.useful_life_months ?? ""}/></label>
         </div>
         <label>ملاحظات<textarea name="notes" maxLength={5000} defaultValue={a.notes || ""}/></label>
-        <label className="check-label"><input type="checkbox" name="public_visible" defaultChecked={a.public_visible}/>إظهار الأصل في الموقع العام</label>
+        <label className="check-label"><input type="checkbox" name="public_visible" defaultChecked={a.public_visible}/>إظهار اللوحة في الموقع العام</label>
         <p className="subtle">الاستبعاد لا يحذف السجل، ويحتاج انتهاء أو إلغاء الحجوزات الحالية والمستقبلية. الإهلاك تقديري؛ لا يُرحّل قيدًا محاسبيًا.</p>
       </DataForm>
     </details>}
@@ -66,14 +66,14 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
         return [<span key={r.id}>{c?.ref_no || "عقد"}<small>{party?.name || "—"}</small></span>, `${date(r.start_date)} — ${date(r.end_date)}`, egp(r.monthly_price), statuses[r.status] || r.status];
       })}/>
     </details>
-    <details className="asset-section"><summary>الصيانة وأوامر العمل · {work.length}</summary>
+    <details className="asset-section"><summary>التركيب والصيانة · {work.length}</summary>
       <GridTable columns={["أمر العمل", "المسؤول", "الاستحقاق", "الحالة / الإغلاق"]} rows={work.map((r) => [
         <span key={r.id}>{r.ref_no}<small>{r.title}</small></span>, o.employeeDirectory.find((e) => e.id === r.assigned_employee_id)?.full_name || "غير مسند",
         date(r.due_date), <span key={r.id}><State value={r.status}/><small>{r.resolution}</small></span>,
       ])}/>
     </details>
     <details className="asset-section"><summary>الفحص الميداني · {inspections.length}</summary>
-      <GridTable columns={["التاريخ", "حالة الأصل", "طريقة الفحص", "الملاحظات"]} rows={inspections.map((r) => [date(r.checked_at), <State key={r.id} value={r.condition}/>, r.method === "manual" ? "يدوي" : r.method.toUpperCase(), r.notes || "—"])}/>
+      <GridTable columns={["التاريخ", "حالة اللوحة", "طريقة الفحص", "الملاحظات"]} rows={inspections.map((r) => [date(r.checked_at), <State key={r.id} value={r.condition}/>, r.method === "manual" ? "يدوي" : r.method.toUpperCase(), r.notes || "—"])}/>
     </details>
     <details className="asset-section"><summary>التراخيص · {licenses.length}</summary>
       <GridTable columns={["المرجع", "الجهة المصدرة", "الانتهاء"]} rows={licenses.map((r) => [r.ref_no,r.issuer,date(r.expires_on)])}/>
@@ -87,7 +87,7 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
     {canFinance && <details className="asset-section"><summary>حركات النقدية المرتبطة · {cash.length}</summary>
       <GridTable columns={["المرجع", "التاريخ", "البيان", "النوع", "القيمة"]} rows={cash.map((r) => [r.ref_no, date(r.transaction_date), r.description, ({income:"إيراد",expense:"مصروف",transfer:"تحويل"} as Record<string,string>)[r.kind] || r.kind,egp(r.amount)])}/>
     </details>}
-    {d.profile.role === "admin" && <details className="asset-section"><summary>سجل تعديلات الأصل · {audit.length}</summary>
+    {d.profile.role === "admin" && <details className="asset-section"><summary>سجل تعديلات اللوحة · {audit.length}</summary>
       <GridTable columns={["التاريخ", "الإجراء", "المستخدم"]} rows={audit.map((r) => [date(r.created_at), ({INSERT:"إنشاء",UPDATE:"تعديل",DELETE:"حذف",ASSET_LOCATION:"تصحيح الموقع"} as Record<string,string>)[r.operation] || r.operation, o.tenantUsers.find((u) => u.id === r.actor_id)?.full_name || "إجراء نظام"] )}/>
     </details>}
   </div>;

@@ -188,7 +188,7 @@ export function Analytics({
         )}
         <Panel
           title="الإشغال حسب المناطق"
-          subtitle="حالة الأصول الحالية ضمن نطاق صلاحياتك"
+          subtitle="حالة اللوحات الحالية ضمن نطاق صلاحياتك"
         >
           <div className="district-bars">
             {districts.map((r) => (
@@ -209,7 +209,7 @@ export function Analytics({
               </div>
             ))}
             {!districts.length && (
-              <p className="subtle">أضف المناطق والأصول لعرض التوزيع.</p>
+              <p className="subtle">أضف المناطق واللوحات لعرض التوزيع.</p>
             )}
           </div>
           <div className="analytics-ops">

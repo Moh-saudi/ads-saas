@@ -12,7 +12,7 @@ export function AssetLocation({ asset, demo }: { asset: Asset; demo: boolean }) 
       <input type="hidden" name="id" value={asset.id} />
       <LocationPicker value={point} onChange={setPoint} />
       <label>سبب تصحيح الموقع<textarea name="reason" minLength={10} maxLength={1000} required /></label>
-      <p className="subtle">تتحدث نقطة الأصل على الخرائط بعد الحفظ؛ المنطقة والشارع يتبعان التسجيل الإداري ولا يُستنتجان من النقطة.</p>
+      <p className="subtle">تتحدث نقطة اللوحة على الخرائط بعد الحفظ؛ المنطقة والشارع يتبعان التسجيل الإداري ولا يُستنتجان من النقطة.</p>
     </DataForm>
   </details>;
 }

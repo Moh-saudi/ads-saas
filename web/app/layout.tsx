@@ -25,7 +25,7 @@ const dashboardNumbers = localFont({
 });
 export const metadata = {
   title: { default: "مِسك | إدارة المساحات الإعلانية", template: "%s | مِسك" },
-  description: "إدارة الأصول والعقود والمواقع الإعلانية من مكان واحد.",
+  description: "إدارة اللوحات والعقود والمواقع الإعلانية من مكان واحد.",
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg" },
   appleWebApp: { capable: true, title: "Mesk", statusBarStyle: "default" },

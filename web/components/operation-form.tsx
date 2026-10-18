@@ -419,7 +419,7 @@ export function OperationForm({
               <option value="adjustment_out">عجز جرد</option>
             </select>
           </label>
-          <Field name="ref_no" label="مرجع الحركة" />
+          <Field name="ref_no" label="رقم الحركة" />
           <Pick name="item_id" label="الصنف" options={items} />
           {["issue", "transfer", "adjustment_out"].includes(stockKind) && (
             <Pick
@@ -451,7 +451,7 @@ export function OperationForm({
           {stockKind === "return" && (
             <Pick
               name="return_of"
-              label="الحركة المصروفة الأصلية"
+              label="إذن الصرف الأصلي"
               options={o.stockMoves
                 .filter((m) => m.kind === "issue")
                 .map((m) => ({
@@ -462,7 +462,7 @@ export function OperationForm({
           )}
           <Pick
             name="asset_id"
-            label="الأصل المرتبط"
+            label="اللوحة المرتبطة"
             options={assets}
             required={false}
           />
@@ -542,7 +542,7 @@ export function OperationForm({
         <>
           <Field name="ref_no" label="رقم أمر العمل" />
           <Field name="title" label="المهمة المطلوبة" />
-          <Pick name="asset_id" label="الأصل" options={assets} />
+          <Pick name="asset_id" label="اللوحة" options={assets} />
           <Pick
             name="assigned_employee_id"
             label="الموظف المسؤول"
@@ -597,19 +597,19 @@ export function OperationForm({
       )}
       {kind === "asset_tag" && (
         <>
-          <Pick name="asset_id" label="الأصل" options={assets} />
+          <Pick name="asset_id" label="اللوحة" options={assets} />
           <Pick
             name="tag_kind"
-            label="نوع الوسم"
+            label="نوع كود التعريف"
             options={[
               { id: "qr", name: "QR" },
               { id: "nfc", name: "NFC" },
               { id: "rfid", name: "RFID (تسجيل المعرف فقط)" },
             ]}
           />
-          <Field name="uid" label="معرف الوسم الفريد" />
+          <Field name="uid" label="رقم كود التعريف" />
           <p className="subtle">
-            لـNFC سجّل الرقم التسلسلي المقروء من الوسم. توليد QR متاح بعد حفظ
+            لـNFC سجّل الرقم التسلسلي المقروء من ملصق التعريف. توليد QR متاح بعد حفظ
             معرفه.
           </p>
         </>
@@ -631,7 +631,7 @@ export function OperationForm({
               )}
             </select>
           </label>
-          <Field name="ref_no" label="مرجع السند" />
+          <Field name="ref_no" label="رقم السند" />
           <Pick
             name="cash_account_id"
             label={cashKind === "transfer" ? "التحويل من" : "الخزينة / البنك"}
@@ -663,7 +663,7 @@ export function OperationForm({
           <Field name="description" label="البيان" />
           <Pick
             name="asset_id"
-            label="الأصل (اختياري)"
+            label="اللوحة (اختياري)"
             options={assets}
             required={false}
           />
@@ -684,7 +684,7 @@ export function OperationForm({
       )}
       {kind === "adjustment" && (
         <>
-          <Field name="ref_no" label="مرجع قيد التسوية" />
+          <Field name="ref_no" label="رقم قيد التسوية" />
           <Field name="entry_date" label="تاريخ القيد" type="date" />
           <Note name="description" label="بيان وسبب التسوية" required />
           <AdjustmentLines data={d} />
@@ -868,14 +868,14 @@ function InspectionFields({
       }
     ).NDEFReader;
     if (!NFC) {
-      setMessage("Web NFC غير مدعوم هنا. استخدم QR أو أدخل معرف الوسم يدويًا.");
+      setMessage("Web NFC غير مدعوم هنا. استخدم QR أو أدخل رقم كود التعريف يدويًا.");
       return;
     }
     try {
       const reader = new NFC();
       await reader.scan();
       setMethod("nfc");
-      setMessage("قرّب الهاتف من الوسم.");
+      setMessage("قرّب الهاتف من ملصق التعريف.");
       reader.addEventListener("reading", (e) => {
         setTag(e.serialNumber);
         setMessage("تمت قراءة المعرف. أكمل بيانات الزيارة ثم احفظ.");
@@ -891,7 +891,7 @@ function InspectionFields({
     <>
       <Pick
         name="asset_id"
-        label="الأصل"
+        label="اللوحة"
         value={initialAsset}
         options={d.assets.map((a) => ({
           id: a.id,
@@ -922,7 +922,7 @@ function InspectionFields({
       </label>
       {method !== "manual" && (
         <label>
-          معرف الوسم
+          رقم كود التعريف
           <input
             name="tag_uid"
             required
@@ -997,7 +997,7 @@ function QrPreview({ data: d, id }: { data: WorkspaceData; id: string }) {
   }, [t, d.demo]);
   return (
     <div className="qr-preview">
-      {src && <img src={src} alt={`رمز QR للأصل ${asset?.code}`} />}
+      {src && <img src={src} alt={`رمز QR للوحة ${asset?.code}`} />}
       <h3>{asset?.code}</h3>
       <p>{asset?.street_name}</p>
       <code>{t?.uid}</code>

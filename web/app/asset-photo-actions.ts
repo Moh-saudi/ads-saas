@@ -3,7 +3,7 @@ import { requireContext } from "@/lib/data";
 import { prepareAssetPhoto, storeAssetPhoto } from "@/lib/asset-photo-storage";
 export type AssetPhoto = { name: string; url: string };
 type Result = { ok: boolean; message: string; photos?: AssetPhoto[] };
-const failure: Result = { ok: false, message: "تعذر تنفيذ العملية. تحقق من الاتصال وصلاحيات الأصل وإعداد تخزين الصور." };
+const failure: Result = { ok: false, message: "تعذر تنفيذ العملية. تحقق من الاتصال وصلاحيات اللوحة وإعداد تخزين الصور." };
 async function photoContext(asset: string, writing = false) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(asset)) throw new Error("FORBIDDEN");
   const ctx = await requireContext();
@@ -37,7 +37,7 @@ export async function uploadAssetPhoto(asset: string, form: FormData): Promise<R
   catch (error) { return { ok: false, message: (error as Error).message }; }
   if (!photo) return { ok: false, message: "اختر صورة أولًا." };
   const { error } = await storeAssetPhoto(db, brand.id, asset, photo);
-  return error ? failure : { ok: true, message: "تم رفع الصورة وربطها بالأصل." };
+  return error ? failure : { ok: true, message: "تم رفع الصورة وربطها باللوحة." };
 }
 export async function deleteAssetPhoto(asset: string, name: string): Promise<Result> {
   const { db, path } = await photoContext(asset, true);

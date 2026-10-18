@@ -22,19 +22,19 @@ export function AssetPhotos({ asset, canEdit, demo }: { asset: string; canEdit: 
         if (!active) return;
         setLoaded(result.ok);
         if (result.ok) setPhotos(result.photos || []); else setMessage(result.message);
-      } catch { if (active) setMessage("تعذر تحميل صور الأصل. تحقق من الاتصال وإعداد التخزين."); }
+      } catch { if (active) setMessage("تعذر تحميل صور اللوحة. تحقق من الاتصال وإعداد التخزين."); }
     });
     return () => { active = false; };
   }, [asset, demo]);
-  return <section className="asset-section asset-photos"><h3>صور الموقع والأصل</h3>
+  return <section className="asset-section asset-photos"><h3>صور الموقع واللوحة</h3>
     <p className="subtle">صور خاصة بالشركة؛ روابط العرض مؤقتة لمدة 5 دقائق. حدّث المعرض إذا انتهت صلاحيتها.</p>
     {demo ? <p className="notice">يمكن رفع الصور في مساحة العمل الفعلية؛ الرفع معطل في العرض التجريبي.</p> : <>
       {message && <p role="status" className="notice">{message}</p>}
       {pending && <p role="status">جارٍ تنفيذ العملية…</p>}
       <button type="button" className="button secondary" disabled={pending} onClick={() => run(refresh)}>تحديث الصور</button>
-      {loaded && !photos.length && <p>لم تُرفع صور لهذا الأصل بعد.</p>}
+      {loaded && !photos.length && <p>لم تُرفع صور لهذه اللوحة بعد.</p>}
       <div className="asset-photo-grid">{photos.map((photo, i) => <figure key={photo.name}>
-        <a href={photo.url} target="_blank" rel="noopener noreferrer"><img src={photo.url} alt={`صورة الأصل ${i + 1}`} loading="lazy" /></a>
+        <a href={photo.url} target="_blank" rel="noopener noreferrer"><img src={photo.url} alt={`صورة اللوحة ${i + 1}`} loading="lazy" /></a>
         <figcaption>صورة {i + 1} {canEdit && <button type="button" className="text-button" disabled={pending} onClick={() => {
           if (!window.confirm("حذف هذه الصورة نهائيًا؟")) return;
           run(async () => { const result = await deleteAssetPhoto(asset, photo.name); setMessage(result.message); if (result.ok) await refresh(); });

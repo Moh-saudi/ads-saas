@@ -84,7 +84,7 @@ const formatDate = (v: string | null) =>
       }).format(new Date(`${v}T12:00:00Z`))
     : "—";
 const navigation = [
-  { id: "guide", label: "دليل بدء التشغيل", icon: FileText, module: "guide" },
+  { id: "guide", label: "دليل الاستخدام", icon: FileText, module: "guide" },
   {
     id: "dashboard",
     label: "نظرة عامة",
@@ -93,7 +93,7 @@ const navigation = [
   },
   {
     id: "assets",
-    label: "الأصول والمواقع",
+    label: "اللوحات والمواقع",
     icon: PanelsTopLeft,
     module: "assets",
   },
@@ -105,13 +105,13 @@ const navigation = [
   },
   {
     id: "upstream",
-    label: "العقود الصاعدة",
+    label: "عقود استغلال المواقع",
     icon: Layers,
     module: "upstream_contracts",
   },
   {
     id: "customers",
-    label: "العملاء والأطراف",
+    label: "العملاء والموردون والجهات",
     icon: Users,
     module: "customers",
   },
@@ -123,20 +123,20 @@ const navigation = [
   },
   {
     id: "finance",
-    label: "الفواتير والتحصيل",
+    label: "الفواتير والتحصيلات",
     icon: Wallet,
     module: "finance",
   },
-  { id: "licenses", label: "التراخيص", icon: ShieldCheck, module: "licenses" },
+  { id: "licenses", label: "التراخيص والتصاريح", icon: ShieldCheck, module: "licenses" },
   {
     id: "conflicts",
-    label: "التعارضات والتنبيهات",
+    label: "التنبيهات ومشكلات الحجز",
     icon: TriangleAlert,
     module: "dashboard",
   },
   {
     id: "settings",
-    label: "هوية الشركة والإعدادات",
+    label: "إعدادات الشركة",
     icon: Settings,
     module: "settings",
   },
@@ -416,7 +416,7 @@ export function Workspace({
                   {section === "contracts"
                     ? "عقد جديد"
                     : section === "assets"
-                      ? "إضافة أصل"
+                      ? "إضافة لوحة"
                       : section === "customers"
                         ? "إضافة طرف"
                         : section === "finance"
@@ -424,7 +424,7 @@ export function Workspace({
                           : section === "licenses"
                             ? "إضافة ترخيص"
                             : section === "upstream"
-                              ? "عقد صاعد جديد"
+                              ? "عقد استغلال جديد"
                               : "إضافة شارع"}
                 </button>
               )}
@@ -445,28 +445,28 @@ export function Workspace({
                 <>
                   <div className="kpi-grid">
                     <Kpi
-                      title="إجمالي الأصول"
+                      title="إجمالي اللوحات"
                       value={number(d.kpis.total_assets)}
                       icon={<PanelsTopLeft size={21} />}
-                      footer={`${number(d.kpis.leased)} أصلًا مؤجرًا`}
+                      footer={`${number(d.kpis.leased)} لوحة مؤجرة`}
                       tone="navy"
                     />
                     <Kpi
                       title="نسبة الإشغال"
                       value={`${number(d.kpis.occupancy_pct)}%`}
                       icon={<LayoutGrid size={21} />}
-                      footer={`${number(Number(d.kpis.total_assets) - Number(d.kpis.leased))} أصل غير مؤجر`}
+                      footer={`${number(Number(d.kpis.total_assets) - Number(d.kpis.leased))} لوحة غير مؤجرة`}
                       tone="green"
                     />
                     <Kpi
-                      title="الإيراد الشهري التعاقدي"
+                      title="قيمة الإعلانات الشهرية"
                       value={money(d.kpis.monthly_revenue)}
                       icon={<Wallet size={21} />}
                       footer="قيمة الإيجارات السارية حاليًا"
                       tone="gold"
                     />
                     <Kpi
-                      title="صافي الهامش الشهري"
+                      title="هامش استغلال اللوحات"
                       value={money(d.kpis.net_margin)}
                       icon={<ArrowUpRight size={21} />}
                       footer={`التكلفة ${money(d.kpis.monthly_cost)}`}
@@ -479,10 +479,10 @@ export function Workspace({
                     <section className="card map-card">
                       <CardHead
                         title="مواقعك على الخريطة"
-                        sub="توزيع الأصول وحالة الإشغال"
+                        sub="توزيع اللوحات وحالة الإشغال"
                         action={
                           <Link href={`${base}/assets`}>
-                            عرض الأصول <ChevronLeft size={15} />
+                            عرض اللوحات <ChevronLeft size={15} />
                           </Link>
                         }
                       />
@@ -508,8 +508,8 @@ export function Workspace({
                     </section>
                     <section className="card occupancy-card">
                       <CardHead
-                        title="حالة المحفظة"
-                        sub="الإشغال الحالي للأصول"
+                        title="حالة اللوحات"
+                        sub="الإشغال الحالي للوحات"
                       />
                       <div
                         className="donut"
@@ -611,11 +611,11 @@ export function Workspace({
                           <strong>
                             {conflicts.length
                               ? `${number(conflicts.length)} تعارضات في التغطية`
-                              : "سلسلة التعاقد سليمة"}
+                              : "مدد العقود متوافقة"}
                           </strong>
                           <small>
                             {conflicts.length
-                              ? "تحتاج مراجعة العقود الصاعدة"
+                              ? "تحتاج مراجعة عقود استغلال المواقع"
                               : "لا توجد تعارضات حالية مرصودة"}
                           </small>
                         </span>
@@ -624,14 +624,14 @@ export function Workspace({
                       <div className="chain-mini">
                         <span>الجهة المالكة</span>
                         <ChevronLeft size={13} />
-                        <span>الوطنية</span>
+                        <span>صاحب الامتياز</span>
                         <ChevronLeft size={13} />
                         <b>شركتك</b>
                         <ChevronLeft size={13} />
                         <span>المعلن</span>
                       </div>
                       <p className="subtle">
-                        لا تُقبل مدة إيجار تتجاوز التغطية الصاعدة إلا باستثناء
+                        لا تُقبل مدة إيجار تتجاوز فترة استغلال الموقع إلا باستثناء
                         معتمد ومسجل.
                       </p>
                     </section>
@@ -645,7 +645,7 @@ export function Workspace({
                     <div className="search-box">
                       <Search size={18} />
                       <input
-                        aria-label="البحث في الأصول"
+                        aria-label="البحث في اللوحات"
                         placeholder="ابحث بالكود أو الشارع أو المنطقة…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -683,7 +683,7 @@ export function Workspace({
                     </div>
                   </div>
                   <div className="results-label">
-                    {number(filtered.length)} أصل · اضغط على الأصل لعرض تفاصيله
+                    {number(filtered.length)} لوحة · اضغط على اللوحة لعرض تفاصيله
                   </div>
                   {mapView ? (
                     <AssetMap assets={filtered} onSelect={selectAsset} />
@@ -696,7 +696,7 @@ export function Workspace({
                 <section className="card">
                   <CardHead
                     title="سجل عقود المعلنين"
-                    sub="الحجز محمي من تداخل الفترات وتجاوز التغطية"
+                    sub="منع حجز اللوحة مرتين في نفس الفترة أو بعد انتهاء حق استغلالها"
                   />
                   <Table
                     headings={[
@@ -776,7 +776,7 @@ export function Workspace({
               {section === "customers" && (
                 <section className="card">
                   <CardHead
-                    title="دليل العملاء والأطراف"
+                    title="دليل العملاء والموردون والجهات"
                     sub="المعلنون، الجهات المالكة، الشركات والموردون"
                   />
                   <Table
@@ -799,7 +799,7 @@ export function Workspace({
                               advertiser: "معلن",
                               agency: "وكالة",
                               authority: "جهة مالكة",
-                              master_concessionaire: "الشركة الوطنية",
+                              master_concessionaire: "صاحب الامتياز",
                               supplier: "مورد",
                             }[p.type]
                           }
@@ -836,7 +836,7 @@ export function Workspace({
                           onClick={() => setModal("asset_type")}
                         >
                           <Plus size={16} />
-                          نوع أصل
+                          نوع لوحة
                         </button>
                       </>
                     )}
@@ -846,8 +846,8 @@ export function Workspace({
                       headings={[
                         "الشارع",
                         "المنطقة",
-                        "نطاق الاستغلال",
-                        "عدد الأصول",
+                        "نطاق التعاقد",
+                        "عدد اللوحات",
                       ]}
                     >
                       {d.streets.map((s) => (
@@ -904,7 +904,7 @@ export function Workspace({
                           ),
                       )}
                       icon={<Building2 size={21} />}
-                      footer="الوطنية وباقي الأطراف"
+                      footer="الجهات والموردون"
                       tone="gold"
                     />
                     <Kpi
@@ -982,7 +982,7 @@ export function Workspace({
                   <Table
                     headings={[
                       "رقم الترخيص",
-                      "الأصل",
+                      "اللوحة",
                       "جهة الإصدار",
                       "انتهاء الصلاحية",
                     ]}
@@ -1011,7 +1011,7 @@ export function Workspace({
                   <section className="card">
                     <CardHead
                       title={`تعارضات التغطية الحالية (${number(conflicts.length)})`}
-                      sub="راجع العقد الصاعد أو مدة عقد المعلن"
+                      sub="راجع عقد استغلال المواقع أو مدة عقد المعلن"
                     />
                     {conflicts.length ? (
                       <AssetTable assets={conflicts} onSelect={selectAsset} />
@@ -1019,7 +1019,7 @@ export function Workspace({
                       <div className="all-clear">
                         <ShieldCheck size={40} />
                         <h3>لا توجد تعارضات حالية</h3>
-                        <p>الأصول المؤجرة الحالية ضمن تغطيتها التعاقدية.</p>
+                        <p>اللوحات المؤجرة الحالية ضمن تغطيتها التعاقدية.</p>
                       </div>
                     )}
                   </section>
@@ -1187,15 +1187,15 @@ export function Workspace({
               : (
                   {
                     party: "إضافة عميل أو طرف",
-                    asset: "إضافة أصل إعلاني",
+                    asset: "إضافة لوحة إعلانية",
                     contract: "إنشاء عقد معلن",
                     street: "إضافة شارع",
                     district: "إضافة منطقة",
                     governorate: "إضافة محافظة",
-                    asset_type: "إضافة نوع أصل",
+                    asset_type: "إضافة نوع لوحة",
                     invoice: "إنشاء فاتورة",
                     license: "إضافة ترخيص",
-                    upstream: "إنشاء عقد صاعد",
+                    upstream: "إنشاء عقد استغلال مواقع",
                   } as Record<string, string>
                 )[modal] || "إضافة سجل"
           }
@@ -1206,7 +1206,7 @@ export function Workspace({
       )}
       {selected && (
         <Modal
-          title={`بطاقة الأصل · ${selected.code}`}
+          title={`بطاقة اللوحة · ${selected.code}`}
           onClose={() => setSelected(null)}
         >
           <AssetRecord
@@ -1310,7 +1310,7 @@ function AssetTable({
 }) {
   return (
     <Table
-      headings={["الأصل / الموقع", "نوع الأصل", "الحالة", "نهاية الإيجار", ""]}
+      headings={["اللوحة / الموقع", "نوع اللوحة", "الحالة", "نهاية الإيجار", ""]}
     >
       {assets.map((a) => (
         <tr key={a.id} onClick={() => onSelect(a)} className="clickable">
@@ -1464,7 +1464,7 @@ function Select({
         ))}
       </select>
       {!rows.length && <small>أضف السجلات المطلوبة أولًا.</small>}
-      {multiple && <small>يمكن اختيار أكثر من أصل باستخدام Ctrl أو ⌘.</small>}
+      {multiple && <small>يمكن اختيار أكثر من لوحة باستخدام Ctrl أو ⌘.</small>}
     </label>
   );
 }
@@ -1491,7 +1491,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             <select name="type">
               {Object.entries({
                 advertiser: "معلن",
-                master_concessionaire: "الشركة الوطنية",
+                master_concessionaire: "صاحب الامتياز",
                 authority: "جهة مالكة",
                 agency: "وكالة",
                 supplier: "مورد",
@@ -1513,11 +1513,11 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
       {actual === "asset" && (
         <>
-          <Field label="كود الأصل" name="code" />
+          <Field label="كود اللوحة" name="code" />
           <Select label="الشارع" name="street_id" rows={d.streets} />
-          <Select label="نوع الأصل" name="type_id" rows={d.assetTypes} />
+          <Select label="نوع اللوحة" name="type_id" rows={d.assetTypes} />
           <LocationPicker value={assetPoint} onChange={setAssetPoint} center={assetCenter ? { latitude: Number(assetCenter.latitude), longitude: Number(assetCenter.longitude) } : undefined} />
-          <label>صورة أولية للأصل (اختياري)<input type="file" name="asset_photo" accept="image/png,image/jpeg,image/webp" /><small>حتى 2 ميجابايت. يمكنك رفع صور إضافية من بطاقة الأصل بعد حفظه؛ الصور خاصة بالشركة.</small></label>
+          <label>صورة اللوحة (اختياري)<input type="file" name="asset_photo" accept="image/png,image/jpeg,image/webp" /><small>حتى 2 ميجابايت. يمكنك رفع صور إضافية من بطاقة اللوحة بعد حفظه؛ الصور خاصة بالشركة.</small></label>
           <div className="form-grid">
             <Field
               label="الطول (م)"
@@ -1544,11 +1544,11 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
           </div>
           <label className="check-label">
             <input type="checkbox" name="public_visible" />
-            عرض هذا الأصل في موقع الشركة العام
+            عرض هذه اللوحة في موقع الشركة العام
           </label>
           <div className="form-grid">
             <Field
-              label="تكلفة اقتناء الأصل"
+              label="تكلفة شراء أو تصنيع اللوحة"
               name="cost"
               type="number"
               min="0"
@@ -1574,7 +1574,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       {actual === "contract" && (
         <>
           <div className="notice">
-            يفحص النظام تغطية العقد الصاعد ويمنع الحجز المزدوج قبل حفظ العقد
+            يفحص النظام تغطية عقد استغلال المواقع ويمنع الحجز المزدوج قبل حفظ العقد
             بالكامل.
           </div>
           <Select
@@ -1582,13 +1582,13 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             name="customer_id"
             rows={d.parties.filter((p) => p.type === "advertiser")}
           />
-          <Field label="مرجع العقد" name="ref_no" />
+          <Field label="رقم العقد" name="ref_no" />
           <div className="form-grid">
             <Field label="تاريخ البداية" name="start_date" type="date" />
             <Field label="تاريخ النهاية (شامل)" name="end_date" type="date" />
           </div>
           <Select
-            label="الأصول"
+            label="اللوحات"
             name="asset_id"
             rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({
               id: a.id,
@@ -1597,7 +1597,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             multiple
           />
           <Field
-            label="الإيجار الشهري لكل أصل (ج.م)"
+            label="الإيجار الشهري لكل لوحة (ج.م)"
             name="monthly_price"
             type="number"
             min="0"
@@ -1635,7 +1635,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             rows={d.districts}
           />
           <label>
-            نطاق الاستغلال
+            نطاق التعاقد
             <select name="holding">
               <option value="partial">مواقع متفرقة</option>
               <option value="full">الشارع بالكامل</option>
@@ -1687,7 +1687,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       {actual === "license" && (
         <>
           <Select
-            label="الأصل"
+            label="اللوحة"
             name="asset_id"
             rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({ id: a.id, name: a.code }))}
           />
@@ -1698,7 +1698,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
       {actual === "upstream" && (
         <>
-          <Field label="مرجع العقد" name="ref_no" />
+          <Field label="رقم العقد" name="ref_no" />
           <Select
             label="الجهة المالكة"
             name="grantor_party_id"
@@ -1706,14 +1706,14 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             rows={d.parties.filter((p) => p.type === "authority")}
           />
           <Select
-            label="صاحب حق الاستغلال (الوطنية)"
+            label="صاحب الامتياز (إن وجد)"
             name="master_party_id"
             required={false}
             rows={d.parties.filter((p) => p.type === "master_concessionaire")}
           />
           <p className="subtle">
             اختر طرفًا واحدًا على الأقل لربط مستحقات وأقساط العقد بالجهة
-            الصحيحة.
+            الصحيحة. صاحب الامتياز هو الشركة الحاصلة على حق استغلال المواقع، مثل الوطنية، إن كان التعاقد يتم من خلالها.
           </p>
           <div className="form-grid">
             <Field label="البداية" name="start_date" type="date" />
@@ -1735,13 +1735,13 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             step="0.01"
           />
           <Select
-            label="الأصول المشمولة"
+            label="اللوحات المشمولة"
             name="asset_id"
             rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({ id: a.id, name: a.code }))}
             multiple
           />
           <Field
-            label="التكلفة الشهرية المخصصة لكل أصل محدد (ج.م)"
+            label="التكلفة الشهرية المخصصة لكل لوحة محددة (ج.م)"
             name="monthly_cost"
             type="number"
             min="0"

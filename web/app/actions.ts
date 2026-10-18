@@ -42,13 +42,13 @@ function friendly(message: string, code?: string) {
     INVALID_WEBSITE_CONTENT: "راجع العناوين وبيانات أقسام الموقع والحد الأقصى لعدد العناصر.",
     INVALID_COORDINATES: "اختر نقطة صحيحة على الخريطة قبل الحفظ.",
     ASSET_HAS_ACTIVE_LEASES:
-      "لا يمكن استبعاد الأصل قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
-    ASSET_RETIRED: "هذا الأصل مستبعد. أعد تفعيله من بطاقة الأصل قبل حجزه.",
-    ASSET_OUT_OF_SCOPE: "الأصل غير نشط أو يقع خارج نطاق صلاحيتك. راجع حالته وتغطية منطقتك.",
+      "لا يمكن استبعاد اللوحة قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
+    ASSET_RETIRED: "هذه اللوحة مستبعدة. أعد تفعيلها من بطاقة اللوحة قبل حجزها.",
+    ASSET_OUT_OF_SCOPE: "اللوحة غير نشطة أو تقع خارج المنطقة المسموح لك بإدارتها. راجع حالتها وصلاحياتك.",
     CONTROL_ACCOUNT_REQUIRES_WORKFLOW:
       "هذا الحساب مرتبط بسجل تشغيلي؛ استخدم سند النقدية أو المخزون أو الفوترة المرتبطة به.",
     UPSTREAM_PARTY_REQUIRED:
-      "اختر الجهة المالكة أو صاحب حق الاستغلال للعقد الصاعد.",
+      "اختر الجهة المالكة أو صاحب حق الاستغلال لعقد استغلال المواقع.",
     INSUFFICIENT_STOCK: "الرصيد المتاح في المخزن لا يكفي لهذه الحركة.",
     INSUFFICIENT_CASH: "رصيد الخزينة أو البنك لا يكفي للصرف في هذا التاريخ.",
     INVALID_STOCK_RETURN:
@@ -62,7 +62,7 @@ function friendly(message: string, code?: string) {
     ATTENDANCE_ALREADY_OPEN:
       "يوجد حضور مفتوح لهذا الموظف. سجّل الانصراف أولًا.",
     NO_OPEN_ATTENDANCE: "لا يوجد تسجيل حضور مفتوح.",
-    INVALID_ASSET_TAG: "الوسم لا يطابق الأصل المحدد.",
+    INVALID_ASSET_TAG: "كود التعريف لا يطابق اللوحة المحددة.",
     FUTURE_ATTENDANCE: "لا يمكن تسجيل حضور أو انصراف في المستقبل.",
     REASON_REQUIRED: "أدخل سببًا واضحًا لتوثيق الإجراء.",
     UNBALANCED_JOURNAL: "القيد غير متوازن. لم تُحفظ الحركة.",
@@ -70,7 +70,7 @@ function friendly(message: string, code?: string) {
   const known = Object.keys(messages).find((key) => message.includes(key));
   if (known) return messages[known];
   if (message.includes("CHAIN_CONFLICT"))
-    return "CHAIN_CONFLICT — فترة الإيجار تتجاوز تغطية العقد الصاعد. قصّر المدة أو جدّد التغطية قبل الحفظ.";
+    return "مدة إعلان العميل تتجاوز مدة استغلال الموقع المتاحة. عدّل المدة أو جدّد عقد استغلال الموقع قبل الحفظ.";
   if (code === "23P01")
     return "العنصر محجوز خلال هذه الفترة. اختر فترة أو عنصرًا آخر.";
   if (code === "23505") return "الرقم أو الكود مستخدم بالفعل داخل الشركة.";
@@ -147,7 +147,7 @@ export async function mutate(
         break;
       case "asset": {
         const geometry = coordinateGeometry(str("latitude"), str("longitude"));
-        if (!geometry) return { ok: false, message: "اختر موقعًا صحيحًا على الخريطة قبل حفظ الأصل." };
+        if (!geometry) return { ok: false, message: "اختر موقعًا صحيحًا على الخريطة قبل حفظ اللوحة." };
         const photo = await prepareAssetPhoto(form.get("asset_photo"));
         const created = await db.from("assets").insert({
           tenant_id: brand.id,
@@ -173,7 +173,7 @@ export async function mutate(
           catch { failed = true; }
           if (failed) {
             revalidatePath("/", "layout");
-            return { ok: true, message: "تم إنشاء الأصل وحفظ موقعه، لكن تعذر رفع الصورة. افتح بطاقة الأصل وأعد رفع الصورة؛ لا تنشئ الأصل مرة أخرى." };
+            return { ok: true, message: "تم إنشاء اللوحة وحفظ موقعه، لكن تعذر رفع الصورة. افتح بطاقة اللوحة وأعد رفع الصورة؛ لا تنشئ اللوحة مرة أخرى." };
           }
         }
         break;

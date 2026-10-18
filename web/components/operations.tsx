@@ -58,19 +58,19 @@ export const operationNavigation = [
   },
   {
     id: "maintenance",
-    label: "الصيانة وأوامر العمل",
+    label: "التركيب والصيانة",
     icon: Wrench,
     module: "maintenance",
   },
   {
     id: "inspections",
-    label: "الفحص الميداني والوسوم",
+    label: "المتابعة الميدانية",
     icon: ClipboardCheck,
     module: "inspections",
   },
   {
     id: "cashbook",
-    label: "الخزينة والمصروفات",
+    label: "الخزينة والبنوك",
     icon: Landmark,
     module: "cashbook",
   },
@@ -86,8 +86,8 @@ export const operationNavigation = [
     icon: MessageCircle,
     module: "whatsapp",
   },
-  { id: "leads", label: "طلبات موقع الشركة", icon: Inbox, module: "leads" },
-  { id: "audit", label: "سجل المراجعة", icon: History, module: "audit" },
+  { id: "leads", label: "طلبات العملاء", icon: Inbox, module: "leads" },
+  { id: "audit", label: "سجل التعديلات", icon: History, module: "audit" },
 ];
 export type OperationModal = { kind: string; id?: string; tag?: string };
 export function Operations({
@@ -475,7 +475,7 @@ export function Operations({
                   "إلى",
                   "الكمية",
                   "التكلفة",
-                  "الأصل / أمر العمل",
+                  "اللوحة / أمر العمل",
                 ]}
                 rows={o.stockMoves
                   .filter((r) => matches({ ...r, name: item(r.item_id) }))
@@ -616,7 +616,7 @@ export function Operations({
             <GridTable
               columns={[
                 "المرجع / المهمة",
-                "الأصل",
+                "اللوحة",
                 "المسؤول",
                 "الموعد",
                 "الأولوية",
@@ -655,23 +655,23 @@ export function Operations({
                   className="button secondary"
                   onClick={() => open("asset_tag")}
                 >
-                  ربط وسم QR / NFC
+                  ربط كود تعريف QR / NFC
                 </button>
               )}
             </>,
           )}
           {tabs([
             { id: "main", label: "سجل الفحص" },
-            { id: "tags", label: "وسوم الأصول" },
+            { id: "tags", label: "أكواد تعريف اللوحات" },
           ])}
           {tab === "main" ? (
             <Panel
               title="الزيارات والفحص الميداني"
-              subtitle="النتائج غير السليمة تسجل حادثًا على الأصل للمراجعة"
+              subtitle="النتائج غير السليمة تسجل حادثًا على اللوحة للمراجعة"
             >
               <GridTable
                 columns={[
-                  "الأصل",
+                  "اللوحة",
                   "تاريخ الزيارة",
                   "الحالة",
                   "طريقة التحقق",
@@ -690,11 +690,11 @@ export function Operations({
             </Panel>
           ) : (
             <Panel
-              title="الوسوم وربطها بالأصول"
+              title="أكواد التعريف وربطها باللوحات"
               subtitle="QR يعمل على جميع الهواتف عبر رابط الفحص؛ قراءة NFC حسب دعم المتصفح والجهاز"
             >
               <GridTable
-                columns={["الأصل", "النوع", "معرف الوسم", "الحالة", ""]}
+                columns={["اللوحة", "النوع", "رقم كود التعريف", "الحالة", ""]}
                 rows={o.assetTags.filter(matches).map((t) => [
                   asset(t.asset_id),
                   t.kind.toUpperCase(),
@@ -757,13 +757,13 @@ export function Operations({
                 </>,
               )}
               {tabs([
-                { id: "main", label: "دفتر النقدية" },
+                { id: "main", label: "حركات الخزينة والبنك" },
                 { id: "journal", label: "القيود اليومية" },
                 { id: "accounts", label: "دليل الحسابات" },
               ])}
               {tab === "main" && (
                 <Panel
-                  title="دفتر الخزائن والبنوك"
+                  title="حركات الخزائن والبنوك"
                   subtitle="الفواتير تُثبت الاستحقاق؛ المقبوضات والمدفوعات تُثبت حركة النقدية"
                 >
                   <GridTable
@@ -945,7 +945,7 @@ export function Operations({
               columns={[
                 "الاسم",
                 "التواصل",
-                "الأصل",
+                "اللوحة",
                 "الطلب",
                 "الحالة",
                 "التاريخ",
@@ -994,7 +994,7 @@ export function Operations({
                 </button>,
               )}
               <Panel
-                title="سجل المراجعة"
+                title="سجل التعديلات"
                 subtitle="تسجيل تلقائي للتغييرات والمستخدم وتوقيتها؛ السجل غير قابل للتعديل من التطبيق"
               >
                 <GridTable
@@ -1019,7 +1019,7 @@ export function Operations({
               </Panel>
             </>
           ) : (
-            <div className="notice">سجل المراجعة متاح لمدير النظام.</div>
+            <div className="notice">سجل التعديلات متاح لمدير النظام.</div>
           )}
         </>
       )}
@@ -1029,7 +1029,7 @@ export function Operations({
             modal.kind.endsWith("_detail")
               ? "تفاصيل السجل"
               : modal.kind === "qr_preview"
-                ? "وسم الأصل"
+                ? "كود تعريف اللوحة"
                 : "إدارة السجل"
           }
           onClose={() => setModal(null)}

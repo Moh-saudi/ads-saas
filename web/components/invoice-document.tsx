@@ -59,8 +59,8 @@ export function InvoiceDocument({
             <span className="invoice-kicker">INVOICE · فاتورة</span>
             <h2>
               {i.direction === "receivable"
-                ? "فاتورة معلن"
-                : "مستند استحقاق مورد"}
+                ? "فاتورة إعلانات"
+                : "مستحقات المورد أو الجهة"}
             </h2>
             <b className="code">{i.ref_no}</b>
             <p>الإصدار: {date(i.issue_date)}</p>
