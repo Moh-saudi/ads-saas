@@ -1,0 +1,200 @@
+{
+  "verified_at": "2026-10-18T09:14:30.379Z",
+  "project": "jdccaknvmenifhipskau.supabase.co",
+  "mode": "read-only API verification; no business records created",
+  "passed": 48,
+  "checks": [
+    {
+      "name": "Supabase Auth accepts configured account",
+      "passed": true
+    },
+    {
+      "name": "authenticated profile belongs to mapped host",
+      "passed": true
+    },
+    {
+      "name": "Data API / upstream_contracts",
+      "passed": true
+    },
+    {
+      "name": "Data API / parties",
+      "passed": true
+    },
+    {
+      "name": "Data API / customer_contracts",
+      "passed": true
+    },
+    {
+      "name": "Data API / streets",
+      "passed": true
+    },
+    {
+      "name": "Data API / tenant_modules",
+      "passed": true
+    },
+    {
+      "name": "Data API / asset_types",
+      "passed": true
+    },
+    {
+      "name": "Data API / districts",
+      "passed": true
+    },
+    {
+      "name": "Data API / licenses",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_kpis",
+      "passed": true
+    },
+    {
+      "name": "Data API / governorates",
+      "passed": true
+    },
+    {
+      "name": "Data API / attendance",
+      "passed": true
+    },
+    {
+      "name": "Data API / leave_requests",
+      "passed": true
+    },
+    {
+      "name": "Data API / employees",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_invoice_balances",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_asset_register",
+      "passed": true
+    },
+    {
+      "name": "Data API / stock_movements",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_stock_balances",
+      "passed": true
+    },
+    {
+      "name": "Data API / inventory_items",
+      "passed": true
+    },
+    {
+      "name": "Data API / warehouses",
+      "passed": true
+    },
+    {
+      "name": "Data API / purchase_orders",
+      "passed": true
+    },
+    {
+      "name": "Data API / work_orders",
+      "passed": true
+    },
+    {
+      "name": "Data API / inspections",
+      "passed": true
+    },
+    {
+      "name": "Data API / payroll_items",
+      "passed": true
+    },
+    {
+      "name": "Data API / ledger_accounts",
+      "passed": true
+    },
+    {
+      "name": "Data API / purchase_lines",
+      "passed": true
+    },
+    {
+      "name": "Data API / cash_transactions",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_cash_balances",
+      "passed": true
+    },
+    {
+      "name": "Data API / journal_lines",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_trial_balance",
+      "passed": true
+    },
+    {
+      "name": "Data API / journal_entries",
+      "passed": true
+    },
+    {
+      "name": "Data API / v_monthly_cashflow",
+      "passed": true
+    },
+    {
+      "name": "Data API / whatsapp_outbox",
+      "passed": true
+    },
+    {
+      "name": "Data API / enquiries",
+      "passed": true
+    },
+    {
+      "name": "Data API / asset_tags",
+      "passed": true
+    },
+    {
+      "name": "Data API / audit_events",
+      "passed": true
+    },
+    {
+      "name": "Data API / contract_installments",
+      "passed": true
+    },
+    {
+      "name": "Data API / contract_lines",
+      "passed": true
+    },
+    {
+      "name": "RPC / employee_directory",
+      "passed": true
+    },
+    {
+      "name": "RPC / tenant_user_directory",
+      "passed": true
+    },
+    {
+      "name": "public catalog remains accessible",
+      "passed": true
+    },
+    {
+      "name": "unknown domain does not resolve a company",
+      "passed": true
+    },
+    {
+      "name": "anonymous private data denied / assets",
+      "passed": true
+    },
+    {
+      "name": "anonymous private data denied / v_asset_register",
+      "passed": true
+    },
+    {
+      "name": "anonymous private data denied / employees",
+      "passed": true
+    },
+    {
+      "name": "anonymous private data denied / enquiries",
+      "passed": true
+    },
+    {
+      "name": "anonymous private data denied / journal_lines",
+      "passed": true
+    }
+  ]
+}

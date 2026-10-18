@@ -1,0 +1,4 @@
+project_id = "mesk-signage"
+
+[functions.whatsapp-reminders]
+verify_jwt = false
