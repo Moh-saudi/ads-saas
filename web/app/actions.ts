@@ -40,6 +40,7 @@ function friendly(message: string, code?: string) {
   const messages: Record<string, string> = {
     INVALID_WEBSITE_URL: "استخدم رابط HTTPS صحيحًا للصورة أو الموقع أو الخريطة.",
     INVALID_WEBSITE_CONTENT: "راجع العناوين وبيانات أقسام الموقع والحد الأقصى لعدد العناصر.",
+    PAYMENT_METHOD_REQUIRED: "اختر طريقة التحصيل أو الدفع قبل الحفظ.",
     INVALID_COORDINATES: "اختر نقطة صحيحة على الخريطة قبل الحفظ.",
     ASSET_HAS_ACTIVE_LEASES:
       "لا يمكن استبعاد اللوحة قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
@@ -67,6 +68,7 @@ function friendly(message: string, code?: string) {
     REASON_REQUIRED: "أدخل سببًا واضحًا لتوثيق الإجراء.",
     UNBALANCED_JOURNAL: "القيد غير متوازن. لم تُحفظ الحركة.",
   };
+  if (code === "PGRST202" && /record_invoice_payment_with_method|create_cash_transaction_with_method/.test(message)) return "يلزم تفعيل تحديث طرق التحصيل على قاعدة البيانات أولًا. تواصل مع مدير النظام ثم أعد المحاولة.";
   const known = Object.keys(messages).find((key) => message.includes(key));
   if (known) return messages[known];
   if (message.includes("CHAIN_CONFLICT"))
@@ -204,12 +206,13 @@ export async function mutate(
         });
         break;
       case "payment":
-        result = await db.rpc("record_invoice_payment", {
+        result = await db.rpc("record_invoice_payment_with_method", {
           p_invoice_id: str("invoice_id"),
           p_amount: num("amount"),
           p_paid_on: str("paid_on"),
           p_reference: str("reference"),
           p_cash_account_id: str("cash_account_id"),
+          p_payment_method: str("payment_method"),
         });
         break;
       case "license":

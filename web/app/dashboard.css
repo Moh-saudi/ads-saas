@@ -264,3 +264,8 @@
 .tour-controls a,.tour-controls button { white-space:normal; text-align:center; }
 .tour-highlight { outline:3px solid #d2ae58; outline-offset:5px; }
 @media(max-width:800px) { .guided-tour { grid-template-columns:minmax(0,1fr); padding:16px; } .tour-controls { max-width:none; } }
+.collection-method-chart { padding:20px; display:grid; gap:16px; min-width:0; }
+.collection-method-row > div:first-child { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.collection-method-track { height:9px; background:#eef1f5; border-radius:6px; overflow:hidden; margin:7px 0; }
+.collection-method-track > span { height:100%; display:block; border-radius:6px; }
+.collection-method-row small { color:#65788a; }

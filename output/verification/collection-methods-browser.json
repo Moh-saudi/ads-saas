@@ -1,0 +1,22 @@
+[
+  {
+    "width": 1440,
+    "channels": 5,
+    "total": 18000,
+    "legacyBucket": true,
+    "requiredMethodField": true,
+    "cashbookMethodVisible": true,
+    "invoicePaymentRows": 5,
+    "noChartOverflow": true
+  },
+  {
+    "width": 390,
+    "channels": 5,
+    "total": 18000,
+    "legacyBucket": true,
+    "requiredMethodField": true,
+    "cashbookMethodVisible": true,
+    "invoicePaymentRows": 5,
+    "noChartOverflow": true
+  }
+]

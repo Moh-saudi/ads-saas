@@ -1,4 +1,5 @@
 "use client";
+import { CollectionChart } from "./collection-chart";
 import { useMemo, useState } from "react";
 import { ArrowDownToLine } from "lucide-react";
 import type { WorkspaceData } from "@/lib/types";
@@ -115,6 +116,7 @@ export function Analytics({
           />
         </div>
       )}
+      {roleFinance && <CollectionChart rows={d.operations.cashTransactions} start={series[0].key+'-01'} />}
       <div className="analytics-grid">
         {roleFinance && (
           <Panel

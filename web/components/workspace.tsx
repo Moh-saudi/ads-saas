@@ -44,9 +44,11 @@ import {
 import { GuidedTour } from "./guided-tour";
 import { WorkflowGuide } from "./workflow-guide";
 import { LocationCoverage } from "./location-coverage";
+import { PaymentMethodField } from "./payment-method-field";
 import { DataForm } from "./forms";
 import type { MapPoint } from "./location-picker";
 import { Operations, operationNavigation } from "./operations";
+import { CollectionChart } from "./collection-chart";
 import { Analytics } from "./analytics";
 import { ContractOperations } from "./contract-operations";
 import { ItemizedInvoiceFields } from "./invoice-fields";
@@ -878,6 +880,7 @@ export function Workspace({
               )}
               {section === "finance" && (
                 <>
+                  {canFinance && <CollectionChart rows={d.operations.cashTransactions} />}
                   <div className="kpi-grid three">
                     <Kpi
                       title="مطلوب تحصيله"
@@ -1659,6 +1662,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
       {actual === "payment" && (
         <>
+          <PaymentMethodField />
           <input type="hidden" name="invoice_id" value={invoice?.id || ""} />
           <div className="notice">
             الفاتورة {invoice?.ref_no} · المتبقي{" "}

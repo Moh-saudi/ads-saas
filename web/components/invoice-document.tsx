@@ -1,4 +1,5 @@
 "use client";
+import { paymentMethodLabel } from "@/lib/payment-methods.mjs";
 import { Printer } from "lucide-react";
 import type { Brand, Party } from "@/lib/types";
 import { fmt, egp, date } from "./ops-ui";
@@ -20,7 +21,7 @@ export type InvoiceDocumentData = {
     tax_rate: number;
     tax_amount: number;
   }[];
-  payments: { amount: number; paid_on: string; reference: string | null }[];
+  payments: { payment_method?: string | null; amount: number; paid_on: string; reference: string | null }[];
 };
 export function InvoiceDocument({
   brand,
@@ -154,6 +155,7 @@ export function InvoiceDocument({
                 <tr>
                   <th>التاريخ</th>
                   <th>المرجع</th>
+                  <th>طريقة الدفع</th>
                   <th>القيمة</th>
                 </tr>
               </thead>
@@ -162,6 +164,7 @@ export function InvoiceDocument({
                   <tr key={n}>
                     <td>{date(p.paid_on)}</td>
                     <td>{p.reference || "—"}</td>
+                    <td>{paymentMethodLabel(p.payment_method)}</td>
                     <td>{egp(p.amount)}</td>
                   </tr>
                 ))}

@@ -32,7 +32,7 @@ export default async function Page({
       .order("id"),
     db
       .from("payments")
-      .select("amount,paid_on,reference")
+      .select("*")
       .eq("invoice_id", id)
       .eq("tenant_id", brand.id)
       .order("paid_on"),

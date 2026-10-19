@@ -54,6 +54,7 @@ export function operationsDemo(): OperationsData {
   const accounts = [
     ["1000", "الخزينة النقدية", "asset"],
     ["1010", "الحساب البنكي", "asset"],
+    ["1020", "محفظة فودافون كاش", "asset"],
     ["1100", "حسابات العملاء — المعلنين", "asset"],
     ["1400", "مخزون المعدات", "asset"],
     ["2000", "حسابات الموردين", "liability"],
@@ -107,6 +108,11 @@ export function operationsDemo(): OperationsData {
       cashTransactions[cashTransactions.length - 1].work_order_id = null;
     }
   }
+  const receiptIndex=cashTransactions.findIndex(t=>t.kind==='receipt'&&t.transaction_date.startsWith(today.slice(0,7)));
+  const template=cashTransactions[receiptIndex];
+  cashTransactions.splice(receiptIndex,1,...[
+    ['cash',4000,'cash1'],['bank_transfer',5000,'cash2'],['instapay',3000,'cash2'],['vodafone_cash',3500,'cash3'],['card',2500,'cash2']
+  ].map(([method,amount,cash],i)=>({...template,id:`collection-${i}`,ref_no:`RCPT-00${i+1}`,amount:Number(amount),cash_account_id:String(cash),payment_method:String(method),description:'تحصيل جزئي لفاتورة INV-001 — شركة آفاق'})));
   const cashflow = Array.from(
     new Set(cashTransactions.map((t) => t.transaction_date.slice(0, 7))),
   )
@@ -131,7 +137,7 @@ export function operationsDemo(): OperationsData {
     {
       id: `jl${t.id}a`,
       entry_id: `j${t.id}`,
-      account_id: "gl1000",
+      account_id: t.cash_account_id === "cash2" ? "gl1010" : t.cash_account_id === "cash3" ? "gl1020" : "gl1000",
       debit: t.kind === "receipt" ? t.amount : 0,
       credit: t.kind === "receipt" ? 0 : t.amount,
     },
@@ -194,6 +200,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     cashAccounts: [
+      {id:"cash3",name:"محفظة فودافون كاش",kind:"cash",ledger_account_id:"gl1020",balance:trialBalance.find(a=>a.code==="1020")!.balance,allow_overdraft:false},
       {
         id: "cash1",
         name: "الخزينة الرئيسية",
@@ -207,7 +214,7 @@ export function operationsDemo(): OperationsData {
         name: "حساب البنك",
         kind: "bank",
         ledger_account_id: "gl1010",
-        balance: 0,
+        balance: trialBalance.find(a=>a.code==="1010")!.balance,
         allow_overdraft: false,
       },
     ],

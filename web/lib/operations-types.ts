@@ -142,6 +142,7 @@ export type CashAccount = {
   allow_overdraft: boolean;
 };
 export type CashTransaction = {
+  payment_method?: string | null;
   id: string;
   ref_no: string;
   cash_account_id: string;

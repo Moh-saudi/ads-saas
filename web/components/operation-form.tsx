@@ -1,4 +1,5 @@
 "use client";
+import { PaymentMethodField } from "./payment-method-field";
 import { useState, useEffect } from "react";
 import {
   Plus,
@@ -616,6 +617,7 @@ export function OperationForm({
       )}
       {kind === "cash" && (
         <>
+          <PaymentMethodField />
           <label>
             نوع الحركة
             <select

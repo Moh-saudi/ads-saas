@@ -35,7 +35,7 @@ export default async function Page({
             tax_amount: 0,
           },
         ],
-        payments: f.paid
+        payments: id === "f1" ? d.operations.cashTransactions.filter(t=>t.ref_no.startsWith("RCPT-")).map(t=>({amount:t.amount,paid_on:t.transaction_date,reference:t.ref_no,payment_method:t.payment_method})) : f.paid
           ? [
               {
                 amount: f.paid,

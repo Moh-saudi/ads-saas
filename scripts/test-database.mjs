@@ -5,6 +5,7 @@ import { postgis } from "@electric-sql/pglite-postgis";
 import { readFile, readdir } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { coordinateGeometry, parseCoordinates } from "../web/lib/coordinates.mjs";
+import { testCollectionMethods } from "./test-collection-methods.mjs";
 import { testAssetMedia } from "./test-asset-media.mjs";
 import { testOperations } from "./test-operations.mjs";
 import { testWebsite } from "./test-website.mjs";
@@ -35,6 +36,8 @@ async function as(user, role = "authenticated") {
   ]);
 }
 try {
+  // Match the tenant business date, including the hours when Cairo is ahead of UTC.
+  await db.exec("set time zone 'Africa/Cairo'");
   // Only platform-owned Auth/Storage schemas are mocked; all application migrations run unchanged.
   await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
   create schema auth; create table auth.users(id uuid primary key);
@@ -417,6 +420,7 @@ try {
     assert.equal(result.rows[0].longitude, 31.1234567);
   });
   await testAssetMedia({db,sql,as,ok,rejects,t1,t2,admin,viewer,manager,inspector,other,a1,a2});
+  await testCollectionMethods({sql,as,ok,rejects,admin,viewer,other,t1,p1});
   console.log(
     `\n${checks} database assertions passed. Auth and Storage platform schemas are test fixtures.`,
   );

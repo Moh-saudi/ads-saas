@@ -240,8 +240,9 @@ export async function operationMutation(
         p_date: s("paid_on") || new Date().toISOString().slice(0, 10),
       });
     case "cash":
-      return db.rpc("create_cash_transaction", {
+      return db.rpc("create_cash_transaction_with_method", {
         p_kind: s("cash_kind"),
+        p_payment_method: s("payment_method"),
         p_ref: s("ref_no"),
         p_cash: s("cash_account_id"),
         p_target: opt("target_cash_account_id"),

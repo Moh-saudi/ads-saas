@@ -57,3 +57,7 @@ assert.equal(current.filter(t=>t.kind==='salary').reduce((s,t)=>s+t.amount,0),o.
 assert.ok(current.some(t=>t.description.includes('PAY-001')&&t.amount===d.finance.find(f=>f.id==='f2').paid));
 for(const a of d.assets){assert.ok(Number.isFinite(a.latitude)&&Number.isFinite(a.longitude));if(a.district_name==='مدينة الشروق')assert.ok(a.longitude>31.6);}
 console.log('Current collections, paid payroll and authority payment reconcile; all 18 map coordinates validated.');
+const methods=new Set(current.filter(t=>t.kind==='receipt').map(t=>t.payment_method));
+assert.deepEqual([...methods].sort(),['bank_transfer','card','cash','instapay','vodafone_cash']);
+for(const a of o.cashAccounts)assert.equal(a.balance,o.trialBalance.find(r=>r.id===a.ledger_account_id).balance);
+console.log('All five collection channels present; receiving account balances match the ledger.');

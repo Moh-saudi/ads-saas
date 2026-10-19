@@ -1,4 +1,5 @@
 "use client";
+import { paymentMethodLabel } from "@/lib/payment-methods.mjs";
 import { useState, useMemo, useEffect } from "react";
 import {
   Users,
@@ -773,6 +774,7 @@ export function Operations({
                       "الخزينة / البنك",
                       "النوع",
                       "البيان",
+                      "طريقة العملية",
                       "القيمة",
                     ]}
                     rows={o.cashTransactions
@@ -796,6 +798,7 @@ export function Operations({
                           } as Record<string, string>
                         )[t.kind],
                         t.description,
+                        paymentMethodLabel(t.payment_method),
                         egp(t.amount),
                       ])}
                   />
