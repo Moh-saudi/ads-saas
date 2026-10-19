@@ -2570,3 +2570,11 @@ tr.clickable:hover {
     display: none;
   }
 }
+
+.location-hierarchy { min-width: 0; margin: 0; padding: 16px; border: 1px solid var(--border, #dce4ee); border-radius: 14px; }
+.location-hierarchy legend { font-weight: 700; padding: 0 6px; }
+.location-hierarchy p, .location-dialog > p { color: var(--muted, #64748b); font-size: .85rem; }
+.location-hierarchy .form-grid > div { min-width: 0; display: grid; gap: 8px; align-content: start; }
+.location-hierarchy select { width: 100%; }
+.location-dialog { position: fixed; margin: auto; width: min(540px, calc(100vw - 32px)); max-height: 85vh; overflow: auto; color: inherit; background: white; border: 1px solid #dce4ee; padding: 24px; }
+.location-dialog::backdrop { background: #10203988; }

@@ -41,6 +41,7 @@ import {
   Globe,
   ExternalLink,
 } from "lucide-react";
+import { LocationHierarchy } from "./location-hierarchy";
 import { GuidedTour } from "./guided-tour";
 import { WorkflowGuide } from "./workflow-guide";
 import { LocationCoverage } from "./location-coverage";
@@ -158,6 +159,7 @@ export function Workspace({
     [search, setSearch] = useState(""),
     [status, setStatus] = useState("all"),
     [mapView, setMapView] = useState(false);
+  const [geographyFilter, setGeographyFilter] = useState({ governorate: "", district: "", street: "" });
   const base = d.demo ? "/demo" : "/app";
   const nav = navigation.find((n) => n.id === section) || navigation[0];
   const enabled = (key: string) =>
@@ -393,7 +395,7 @@ export function Workspace({
                   تصدير
                 </button>
               )}
-              {canCreate && (
+              {canCreate && section !== "geography" && (
                 <button data-tour-create
                   className="button primary"
                   onClick={() =>
@@ -816,49 +818,27 @@ export function Workspace({
               )}
               {section === "geography" && (
                 <>
-                  <div className="inline-actions">
-                    {canCreate && (
-                      <>
-                        <button
-                          className="button secondary"
-                          onClick={() => setModal("governorate")}
-                        >
-                          <Plus size={16} />
-                          محافظة
-                        </button>
-                        <button
-                          className="button secondary"
-                          onClick={() => setModal("district")}
-                        >
-                          <Plus size={16} />
-                          منطقة / حي
-                        </button>
-                        <button
-                          className="button secondary"
-                          onClick={() => setModal("asset_type")}
-                        >
-                          <Plus size={16} />
-                          نوع لوحة
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  <section className="card"><LocationHierarchy d={d} required={false} onHierarchyChange={setGeographyFilter} />
+                    {canCreate && <button className="button secondary" onClick={() => setModal("asset_type")}>إضافة نوع لوحة</button>}
+                    <p>لإضافة لوحة: افتح «اللوحات والمواقع» ثم «إضافة لوحة». ستختار العنوان بنفس التسلسل وتحدد النقطة على الخريطة، ويمكنك إضافة العنوان الناقص دون مغادرة النموذج.</p>
+                    {canAssets && enabled("assets") && <button className="button primary" onClick={() => setModal("asset")}>إضافة لوحة{geographyFilter.street ? " في الشارع المحدد" : " وتحديد موقعها على الخريطة"}</button>}
+                    <Link className="button secondary" href={`${base}/assets`}>عرض كل اللوحات والمواقع</Link>
+                  </section>
                   <section className="card">
                     <Table
                       headings={[
                         "الشارع",
-                        "المنطقة",
+                        "المحافظة / المنطقة",
                         "نطاق التعاقد",
                         "عدد اللوحات",
                       ]}
                     >
-                      {d.streets.map((s) => (
+                      {d.streets.filter(s => (!geographyFilter.street || s.id === geographyFilter.street) && (!geographyFilter.district || s.district_id === geographyFilter.district) && (!geographyFilter.governorate || d.districts.some(x => x.id === s.district_id && x.governorate_id === geographyFilter.governorate))).map((s) => (
                         <tr key={s.id}>
                           <td>{s.name}</td>
                           <td>
                             {
-                              d.districts.find((x) => x.id === s.district_id)
-                                ?.name
+                              (() => { const district = d.districts.find((x) => x.id === s.district_id); return `${d.governorates.find(g => g.id === district?.governorate_id)?.name ?? "—"} / ${district?.name ?? "—"}`; })()
                             }
                           </td>
                           <td>
@@ -1204,7 +1184,7 @@ export function Workspace({
           }
           onClose={() => setModal(null)}
         >
-          <CreateForm kind={modal} d={d} />
+          <CreateForm kind={modal} d={d} initialStreet={section === "geography" ? geographyFilter.street : ""} />
         </Modal>
       )}
       {selected && (
@@ -1354,6 +1334,7 @@ function Modal({
     document.body.style.overflow = "hidden";
     ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
     const handler = (e: KeyboardEvent) => {
+      if (document.querySelector("dialog[open]")) return;
       if (e.key === "Escape") close.current();
       if (e.key === "Tab") {
         const nodes = Array.from(
@@ -1471,7 +1452,7 @@ function Select({
     </label>
   );
 }
-function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
+function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: WorkspaceData; initialStreet?: string }) {
   const [assetPoint, setAssetPoint] = useState<MapPoint | null>(null);
   const clearAssetPoint = useCallback(() => setAssetPoint(null), []);
   const assetCenter = d.assets.find((asset) => asset.latitude != null && asset.longitude != null);
@@ -1517,7 +1498,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       {actual === "asset" && (
         <>
           <Field label="كود اللوحة" name="code" />
-          <Select label="الشارع" name="street_id" rows={d.streets} />
+          <LocationHierarchy d={d} initialStreet={initialStreet} />
           <Select label="نوع اللوحة" name="type_id" rows={d.assetTypes} />
           <LocationPicker value={assetPoint} onChange={setAssetPoint} center={assetCenter ? { latitude: Number(assetCenter.latitude), longitude: Number(assetCenter.longitude) } : undefined} />
           <label>صورة اللوحة (اختياري)<input type="file" name="asset_photo" accept="image/png,image/jpeg,image/webp" /><small>حتى 2 ميجابايت. يمكنك رفع صور إضافية من بطاقة اللوحة بعد حفظه؛ الصور خاصة بالشركة.</small></label>
@@ -1632,11 +1613,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       {actual === "street" && (
         <>
           <Field label="اسم الشارع" name="name" />
-          <Select
-            label="المنطقة / الحي"
-            name="district_id"
-            rows={d.districts}
-          />
+          <DistrictFields d={d} />
           <label>
             نطاق التعاقد
             <select name="holding">
@@ -1758,4 +1735,9 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
     </DataForm>
   );
+}
+
+function DistrictFields({ d }: { d: WorkspaceData }) {
+  const [governorate, setGovernorate] = useState("");
+  return <><label>المحافظة<select required value={governorate} onChange={e => setGovernorate(e.target.value)}><option value="">اختر المحافظة</option>{d.governorates.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label><Select key={governorate} label="المنطقة / الحي" name="district_id" rows={d.districts.filter(x => x.governorate_id === governorate)} /></>;
 }

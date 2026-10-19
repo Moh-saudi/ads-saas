@@ -15,7 +15,7 @@ export function DataForm({
   children: ReactNode;
   demo?: boolean;
   disabled?: boolean;
-  onSuccess?: () => void;
+  onSuccess?: (state: ActionState) => void;
   label?: string;
 }) {
   const [state, action, pending] = useActionState(mutate, initial);
@@ -23,7 +23,7 @@ export function DataForm({
   useEffect(() => {
     if (state.ok && !["brand", "modules", "asset_update", "asset_location", "website_config"].includes(kind))
       ref.current?.reset();
-    if (state.ok) onSuccess?.();
+    if (state.ok) onSuccess?.(state);
   }, [state, kind, onSuccess]);
   return (
     <form ref={ref} action={action} className="data-form">

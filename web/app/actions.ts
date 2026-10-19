@@ -8,7 +8,7 @@ import { prepareAssetPhoto, storeAssetPhoto } from "@/lib/asset-photo-storage";
 import { configured } from "@/lib/env";
 import { operationModules, operationMutation } from "@/lib/operation-actions";
 
-export type ActionState = { ok: boolean; message: string };
+export type ActionState = { ok: boolean; message: string; id?: string };
 export async function login(
   _: ActionState,
   form: FormData,
@@ -117,7 +117,7 @@ export async function mutate(
     if (!data?.enabled)
       return { ok: false, message: "هذه الوحدة غير مفعّلة للشركة." };
   }
-  let result: { error: { message: string; code?: string } | null };
+  let result: { data?: { id: string } | null; error: { message: string; code?: string } | null };
   try {
     if (operationModules[kind]) {
       result = await operationMutation(kind, form, context);
@@ -227,14 +227,14 @@ export async function mutate(
       case "governorate":
         result = await db
           .from("governorates")
-          .insert({ tenant_id: brand.id, name: str("name") });
+          .insert({ tenant_id: brand.id, name: str("name") }).select("id").single();
         break;
       case "district":
         result = await db.from("districts").insert({
           tenant_id: brand.id,
           name: str("name"),
           governorate_id: str("governorate_id"),
-        });
+        }).select("id").single();
         break;
       case "street":
         result = await db.from("streets").insert({
@@ -242,7 +242,7 @@ export async function mutate(
           name: str("name"),
           district_id: str("district_id"),
           holding: str("holding"),
-        });
+        }).select("id").single();
         break;
       case "asset_type":
         result = await db.from("asset_types").insert({
@@ -369,5 +369,5 @@ export async function mutate(
       message: friendly(result.error.message, result.error.code),
     };
   revalidatePath("/", "layout");
-  return { ok: true, message: "تم الحفظ بنجاح." };
+  return { ok: true, message: "تم الحفظ بنجاح.", ...(result.data?.id ? { id: result.data.id } : {}) };
 }
