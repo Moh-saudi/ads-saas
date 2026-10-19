@@ -264,8 +264,26 @@
 .tour-controls a,.tour-controls button { white-space:normal; text-align:center; }
 .tour-highlight { outline:3px solid #d2ae58; outline-offset:5px; }
 @media(max-width:800px) { .guided-tour { grid-template-columns:minmax(0,1fr); padding:16px; } .tour-controls { max-width:none; } }
-.collection-method-chart { padding:20px; display:grid; gap:16px; min-width:0; }
-.collection-method-row > div:first-child { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-.collection-method-track { height:9px; background:#eef1f5; border-radius:6px; overflow:hidden; margin:7px 0; }
+.collection-card { min-width:0; }
+.collection-card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px 0; flex-wrap:wrap; }
+.collection-card-head h2 { font-size:15px; margin:0; }
+.collection-card-head p { font-size:11px; color:var(--muted); margin:4px 0 0; }
+.collection-card-controls { display:flex; align-items:center; flex-wrap:wrap; gap:12px; font-size:13px; }
+.collection-card-controls select { min-height:34px; max-width:100%; border:1px solid var(--line); border-radius:7px; padding:4px 8px; background:#fff; font:inherit; }
+.collection-method-chart { padding:14px 18px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; min-width:0; }
+.collection-method-row { min-width:0; padding:8px 10px; line-height:1.4; background:#f8faf9; border:1px solid var(--line); border-radius:9px; }
+.collection-method-row > div:first-child { flex-wrap:nowrap; }
+.collection-method-row > div:first-child > span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.collection-method-row > div:first-child, .collection-method-value { display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap; font-size:12px; }
+.collection-method-value { margin-top:5px; }
+.collection-method-value b { font-size:13px; }
+.collection-method-track { height:4px; background:#e5ece9; border-radius:6px; overflow:hidden; margin:6px 0 0; }
 .collection-method-track > span { height:100%; display:block; border-radius:6px; }
 .collection-method-row small { color:#65788a; }
+@media(max-width:600px) {
+ .collection-card-head { padding:14px 14px 0; }
+ .collection-card-controls { width:100%; justify-content:space-between; gap:8px; }
+ .collection-method-chart { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px 14px 14px; }
+ .collection-method-row { padding:8px; }
+ .collection-method-row small { font-size:10px; }
+}

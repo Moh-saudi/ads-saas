@@ -6,12 +6,18 @@ import { configured } from "@/lib/env";
 import { normalizeHost } from "@/lib/host";
 import { headers } from "next/headers";
 import { PublicSite } from "@/components/public-site";
+import { shareMetadata, siteDescription, defaultSiteOrigin } from "@/lib/share-metadata";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const brand = await getBrand();
+  const name = brand?.name || "مِسك للإعلان";
+  const title = brand?.website_title ? `${name} | ${brand.website_title}` : `${name} | حلول الإعلان الخارجي`;
+  const description = brand?.website_description || siteDescription;
+  const host = normalizeHost((await headers()).get("host") || "");
   return {
-    title: brand?.website_title || brand?.name || "منصة إدارة اللافتات الذكية",
-    description: brand?.website_description || "",
+    ...shareMetadata({ origin: brand && host ? `https://${host}` : defaultSiteOrigin, title, description, name, logo: brand?.logo_url }),
+    title: { absolute: title },
+    description,
   };
 }
 export default async function Home() {

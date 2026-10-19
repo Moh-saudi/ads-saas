@@ -5,6 +5,7 @@ import "./agency.css";
 import "./dashboard.css";
 import "./invoice.css";
 import { Pwa } from "@/components/pwa";
+import { shareMetadata, siteDescription } from "@/lib/share-metadata";
 const tajawal = localFont({
   src: [
     { path: "./fonts/Tajawal-Regular.ttf", weight: "400" },
@@ -24,8 +25,9 @@ const dashboardNumbers = localFont({
   display: "swap",
 });
 export const metadata = {
+  ...shareMetadata(),
   title: { default: "مِسك | إدارة المساحات الإعلانية", template: "%s | مِسك" },
-  description: "إدارة اللوحات والعقود والمواقع الإعلانية من مكان واحد.",
+  description: siteDescription,
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg" },
   appleWebApp: { capable: true, title: "Mesk", statusBarStyle: "default" },
