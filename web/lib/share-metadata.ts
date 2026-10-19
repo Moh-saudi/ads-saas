@@ -2,14 +2,24 @@ import type { Metadata } from "next";
 
 export const siteDescription = "حلول إعلانية خارجية وإدارة اللوحات والمواقع والعقود والتحصيلات من مكان واحد.";
 export const defaultSiteOrigin = "https://ads-kappa-one.vercel.app";
-// Use Next's public image optimizer so crawlers download a smaller PNG.
-export const shareLogo = "/_next/image?url=%2Fmedia%2Fbrand%2Fmesk-vlab-logo.png&w=1200&q=75";
+// A small, static PNG is directly accessible to social crawlers.
+export const shareLogo = "/media/brand/mesk-share.png";
+export const showcaseTitle = "ميسك | ديمو نظام إدارة شركات الإعلان";
+export const showcaseDescription = "نسخة تجريبية من تطوير ميسك: موقع لشركة إعلانات مرتبط بنظام لإدارة اللوحات والمواقع والعقود والتحصيلات. البيانات المعروضة للتجربة فقط.";
+
+export function showcaseMetadata(): Metadata {
+  return {
+    ...shareMetadata({ title: showcaseTitle, description: showcaseDescription, name: "ميسك — الشركة المطوّرة" }),
+    title: { absolute: showcaseTitle },
+    description: showcaseDescription,
+  };
+}
 
 export function shareMetadata({
   origin = defaultSiteOrigin,
-  title = "مِسك | الإعلان وإدارة المساحات الإعلانية",
+  title = "ميسك | نظام إدارة شركات الإعلان",
   description = siteDescription,
-  name = "مِسك للإعلان",
+  name = "ميسك — الشركة المطوّرة",
   logo,
 }: {
   origin?: string;

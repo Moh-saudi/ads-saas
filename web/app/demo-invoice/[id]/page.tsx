@@ -13,7 +13,7 @@ export default async function Page({
   return (
     <InvoiceDocument
       demo
-      brand={{...d.brand, name:"ميسك للإعلان", logo_url:"/media/brand/mesk-vlab-logo.png"}}
+      brand={{...d.brand, name:"ميسك — ديمو", logo_url:"/media/brand/mesk-vlab-logo.png"}}
       party={d.parties.find((p) => p.id === f.party_id)}
       invoice={{
         ...f,

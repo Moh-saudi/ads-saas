@@ -1,0 +1,14 @@
+{
+  "showcaseRoot": 200,
+  "title": "ميسك | ديمو نظام إدارة شركات الإعلان",
+  "noTenantName": true,
+  "demoEntry": true,
+  "publicStaticLogo": {
+    "status": 200,
+    "bytes": 73260,
+    "width": 1200,
+    "height": 400
+  },
+  "authenticatedAppNotBypassed": true,
+  "unrelatedHostNotBypassed": true
+}

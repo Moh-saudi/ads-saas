@@ -6,9 +6,12 @@ import { configured } from "@/lib/env";
 import { normalizeHost } from "@/lib/host";
 import { headers } from "next/headers";
 import { PublicSite } from "@/components/public-site";
-import { shareMetadata, siteDescription, defaultSiteOrigin } from "@/lib/share-metadata";
+import { shareMetadata, siteDescription, defaultSiteOrigin, showcaseMetadata } from "@/lib/share-metadata";
+import { isShowcaseHost } from "@/lib/showcase-host";
+import { ProductShowcase } from "@/components/product-showcase";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
+  if (isShowcaseHost((await headers()).get("host") || "")) return showcaseMetadata();
   const brand = await getBrand();
   const name = brand?.name || "مِسك للإعلان";
   const title = brand?.website_title ? `${name} | ${brand.website_title}` : `${name} | حلول الإعلان الخارجي`;
@@ -21,6 +24,7 @@ export async function generateMetadata() {
   };
 }
 export default async function Home() {
+  if (isShowcaseHost((await headers()).get("host") || "")) return <ProductShowcase />;
   if (!configured) redirect("/setup");
   const brand = await getBrand();
   if (!brand) redirect("/setup");

@@ -1,23 +1,4 @@
-import { PublicSite } from "@/components/public-site";
-import { demoData } from "@/lib/demo";
-export const metadata = { title: "معاينة موقع عميل" };
-export default function Page() {
-  const d = demoData();
-  return (
-    <PublicSite
-      brand={d.brand}
-      demo
-      areas={d.districts.map((area)=>area.name)}
-      catalog={d.assets
-        .slice(0, 6)
-        .map((a) => ({
-          code: a.code,
-          street: a.street_name,
-          category: a.type_name,
-          length_m: a.length_m,
-          width_m: a.width_m,
-          faces: a.faces,
-        }))}
-    />
-  );
-}
+import { ProductShowcase } from "@/components/product-showcase";
+import { showcaseMetadata } from "@/lib/share-metadata";
+export const metadata = showcaseMetadata();
+export default function Page() { return <ProductShowcase />; }

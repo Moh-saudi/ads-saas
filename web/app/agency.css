@@ -21,3 +21,6 @@
   background: var(--agency-brand, var(--agency-ink));
   color: white;
 }
+
+.is-product-demo .agency-logo > img { width:110px; background:white; padding:5px; border-radius:6px; }
+.is-product-demo .agency-logo small { font-family:inherit; letter-spacing:0; direction:rtl; font-size:10px; }

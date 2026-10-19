@@ -2,12 +2,16 @@
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeHost } from "@/lib/host";
+import { isShowcaseHost } from "@/lib/showcase-host";
 import { configured } from "@/lib/env";
 import type { ActionState } from "./actions";
 export async function requestQuote(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  const h = normalizeHost((await headers()).get("host") || "");
+  if (isShowcaseHost(h))
+    return { ok: false, message: "هذا ديمو ميسك؛ لا تُرسل منه طلبات إلى أي شركة عميلة." };
   if (!configured)
     return { ok: false, message: "هذه معاينة فقط؛ الخدمة غير مربوطة بعد." };
   const s = (k: string) => String(form.get(k) || "").trim();
@@ -22,7 +26,6 @@ export async function requestQuote(
   )
     return { ok: false, message: "راجع الاسم ورقم الهاتف وتفاصيل الطلب." };
   const db = await createClient();
-  const h = normalizeHost((await headers()).get("host") || "");
   const { error } = await db.rpc("submit_enquiry", {
     p_host: h,
     p_name: s("full_name"),

@@ -96,7 +96,7 @@ export function operationsDemo(): OperationsData {
         work_order_id: kind === "expense" ? "w1" : null,
       });
     add("receipt", m === 0 ? 18000 : 76000 + (5 - m) * 6500, "gl4000", 1);
-    if (m === 0) cashTransactions[cashTransactions.length - 1].description = "تحصيل جزئي لفاتورة INV-001 — شركة آفاق";
+    if (m === 0) cashTransactions[cashTransactions.length - 1].description = "تحصيل جزئي لفاتورة INV-001 — عميل تجريبي ١";
     add("expense", 17000 + (m % 3) * 3200, "gl5000", 2);
     add("salary", m === 0 ? 8500 : 29500, "gl5100", 3);
     if (m === 0) cashTransactions[cashTransactions.length - 1].description = "صرف راتب حسن محمد";
@@ -112,7 +112,7 @@ export function operationsDemo(): OperationsData {
   const template=cashTransactions[receiptIndex];
   cashTransactions.splice(receiptIndex,1,...[
     ['cash',4000,'cash1'],['bank_transfer',5000,'cash2'],['instapay',3000,'cash2'],['vodafone_cash',3500,'cash3'],['card',2500,'cash2']
-  ].map(([method,amount,cash],i)=>({...template,id:`collection-${i}`,ref_no:`RCPT-00${i+1}`,amount:Number(amount),cash_account_id:String(cash),payment_method:String(method),description:'تحصيل جزئي لفاتورة INV-001 — شركة آفاق'})));
+  ].map(([method,amount,cash],i)=>({...template,id:`collection-${i}`,ref_no:`RCPT-00${i+1}`,amount:Number(amount),cash_account_id:String(cash),payment_method:String(method),description:'تحصيل جزئي لفاتورة INV-001 — عميل تجريبي ١'})));
   const cashflow = Array.from(
     new Set(cashTransactions.map((t) => t.transaction_date.slice(0, 7))),
   )
@@ -389,7 +389,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     workOrders: [
-      {id:"w3",ref_no:"WO-003",asset_id:"a8",title:"تركيب خامة حملة النخبة وإضاءتها",description:"تركيب كشافين وفحص الإضاءة",assigned_employee_id:"e1",priority:"normal",status:"completed",due_date:day(-2),completed_at:day(-2)+"T14:00:00Z",resolution:"تم التركيب وفحص الإضاءة وتسليم الموقع"},
+      {id:"w3",ref_no:"WO-003",asset_id:"a8",title:"تركيب خامة حملة العميل التجريبي ٢ وإضاءتها",description:"تركيب كشافين وفحص الإضاءة",assigned_employee_id:"e1",priority:"normal",status:"completed",due_date:day(-2),completed_at:day(-2)+"T14:00:00Z",resolution:"تم التركيب وفحص الإضاءة وتسليم الموقع"},
       {
         id: "w1",
         ref_no: "WO-001",
@@ -442,7 +442,7 @@ export function operationsDemo(): OperationsData {
       paid_on: i === 2 ? today : null,
     })),
     enquiries: [
-      {id:"lead2",full_name:"شركة النخبة — مثال",phone:"01100000000",email:"elite@example.com",message:"طلب حملة على طريق السويس لمدة شهرين",asset_code:"MD-0109",status:"contacted",notes:"تم التواصل لإعداد العرض",created_at:day(-2)+"T09:00:00Z"},
+      {id:"lead2",full_name:"عميل تجريبي ٢",phone:"01100000000",email:"elite@example.com",message:"طلب حملة على طريق السويس لمدة شهرين",asset_code:"MD-0109",status:"contacted",notes:"تم التواصل لإعداد العرض",created_at:day(-2)+"T09:00:00Z"},
       {
         id: "lead1",
         full_name: "عميل تجريبي",

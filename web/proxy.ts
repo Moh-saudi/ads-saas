@@ -3,12 +3,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { configured, supabaseUrl, supabaseKey } from "@/lib/env";
 import { normalizeHost } from "@/lib/host";
 import { lookupBrand } from "@/lib/brand-lookup";
+import { isShowcaseHost } from "@/lib/showcase-host";
 
 export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
   headers.delete("x-tenant-id");
   headers.delete("x-tenant-name");
   const path = request.nextUrl.pathname;
+  if (path === "/" && isShowcaseHost(request.headers.get("host") || "")) {
+    return NextResponse.next({ request: { headers } });
+  }
   // These routes render fixtures only and must not depend on the hosted tenant lookup.
   if (path === "/demo" || path.startsWith("/demo/") || path === "/demo-site" || path.startsWith("/demo-receipt/") || path.startsWith("/demo-invoice/") || !configured) {
     return NextResponse.next({ request: { headers } });

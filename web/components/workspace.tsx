@@ -241,7 +241,7 @@ export function Workspace({
     URL.revokeObjectURL(url);
   }
   return (
-    <div className="workspace">
+    <div className={`workspace${d.demo ? " demo-workspace" : ""}`}>
       {menu && (
         <button
           className="sidebar-backdrop"
@@ -260,7 +260,7 @@ export function Workspace({
           </div>
           <div>
             <strong>{d.brand.name}</strong>
-            <small>إدارة المساحات الإعلانية</small>
+            <small>{d.demo ? "الشركة المطوّرة · ديمو" : "إدارة المساحات الإعلانية"}</small>
           </div>
         </Link>
         <div className="workspace-label">

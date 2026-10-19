@@ -20,11 +20,11 @@ export function PublicSite({brand:b,catalog,demo=false,content,areas=[]}:{brand:
     {title:"أقرب إلى يوم جمهورك.",category:"المساحات الحضرية",description:"الفكرة التي تقابل الناس في تفاصيل يومهم.",image_url:agencyImages[1]},
   ];
   const work=c.projects.length?c.projects:concepts;
-  return <div className="agency-site" style={{"--agency-brand":b.primary_color} as CSSProperties}>
-    {demo && <div className="agency-demo">معاينة إبداعية · البيانات المعروضة تجريبية <Link href="/demo/login">لوحة الإدارة <ArrowUpLeft size={14}/></Link></div>}
+  return <div className={`agency-site${demo ? " is-product-demo" : ""}`} style={{"--agency-brand":b.primary_color} as CSSProperties}>
+    {demo && <div className="agency-demo">ميسك — الشركة المطوّرة · ديمو نظام إدارة شركات الإعلان · البيانات للتجربة فقط <Link href="/demo/login">جرّب لوحة الإدارة <ArrowUpLeft size={14}/></Link></div>}
     <div className="agency-hero-wrap">
       <header className="agency-nav">
-        <Link href={demo?"/demo-site":"/"} className="agency-logo">{b.logo_url?<img src={b.logo_url} alt=""/>:<span className="agency-logo-mark"><PanelsTopLeft size={26}/></span>}<span>{b.name}<small>OUTDOOR. OUTSTANDING.</small></span></Link>
+        <Link href={demo?"/demo-site":"/"} className="agency-logo">{b.logo_url?<img src={b.logo_url} alt={b.name}/>:<span className="agency-logo-mark"><PanelsTopLeft size={26}/></span>}<span>{b.name}<small>{demo?"الشركة المطوّرة · نسخة تجريبية":"OUTDOOR. OUTSTANDING."}</small></span></Link>
         <nav aria-label="التنقل الرئيسي" className="agency-desktop-links">{links.map(([href,label])=><a href={href} key={href}>{label}</a>)}</nav>
         <a href="#quote" className="agency-nav-cta">خلّينا نتكلم <ArrowUpLeft size={17}/></a>
         <button className="agency-menu-button" aria-label={menu?"إغلاق قائمة الموقع":"فتح قائمة الموقع"} aria-expanded={menu} aria-controls="agency-mobile-nav" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button>

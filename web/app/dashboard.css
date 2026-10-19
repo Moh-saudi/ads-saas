@@ -287,3 +287,6 @@
  .collection-method-row { padding:8px; }
  .collection-method-row small { font-size:10px; }
 }
+.workspace.demo-workspace .brand-mark { width:96px; height:44px; flex:0 0 96px; background:white; }
+.workspace.demo-workspace .brand-lockup > div:last-child { min-width:0; }
+.workspace.demo-workspace .brand-lockup small { font-size:9px; white-space:normal; }

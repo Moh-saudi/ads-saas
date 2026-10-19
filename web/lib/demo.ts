@@ -3,17 +3,17 @@ import { operationsDemo } from "./operations-demo";
 import { operationSections } from "./operations-types";
 export const demoBrand: Brand = {
   id: "demo",
-  name: "مدار للإعلان",
-  slug: "madar",
-  logo_url: null,
+  name: "ميسك",
+  slug: "mesk-demo",
+  logo_url: "/media/brand/mesk-share.png",
   primary_color: "#0b1f4d",
-  contact_phone: "+201000000000",
-  contact_email: "hello@example.com",
+  contact_phone: null,
+  contact_email: null,
   whatsapp: null,
-  address: "القاهرة الجديدة، مصر",
-  website_title: "مساحة يراها الجميع.",
+  address: "ديمو ميسك — بيانات ومواقع توضيحية",
+  website_title: "ديمو نظام إدارة شركات الإعلان",
   website_description:
-    "حلول إعلانية خارجية في مواقع مختارة. اكتشف المساحة المناسبة لحملتك وتواصل مع فريقنا.",
+    "عرض تجريبي من تطوير ميسك، يوضح ربط موقع شركة إعلانات بإدارة اللوحات والمواقع والعقود والتحصيلات. البيانات والأمثلة للتجربة فقط.",
   public_site_enabled: true,
 };
 // All records and totals below are fixtures for /demo only. They never enter the live database.
@@ -71,7 +71,7 @@ export function demoData(): WorkspaceData {
   const parties = [
     {
       id: "p1",
-      name: "شركة آفاق للتطوير",
+      name: "عميل تجريبي ١",
       type: "advertiser",
       phone: "01000000000",
       whatsapp: null,
@@ -80,7 +80,7 @@ export function demoData(): WorkspaceData {
     },
     {
       id: "p2",
-      name: "مجموعة النخبة",
+      name: "عميل تجريبي ٢",
       type: "advertiser",
       phone: "01100000000",
       whatsapp: null,
