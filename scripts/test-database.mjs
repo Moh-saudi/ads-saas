@@ -5,6 +5,8 @@ import { postgis } from "@electric-sql/pglite-postgis";
 import { readFile, readdir } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { coordinateGeometry, parseCoordinates } from "../web/lib/coordinates.mjs";
+import { testBusinessJourney } from "./test-business-journey.mjs";
+import { testLicensePeriods } from "./test-license-periods.mjs";
 import { testCollectionMethods } from "./test-collection-methods.mjs";
 import { testAssetMedia } from "./test-asset-media.mjs";
 import { testOperations } from "./test-operations.mjs";
@@ -55,6 +57,8 @@ try {
   )
     .filter((f) => f.endsWith(".sql"))
     .sort()) {
+    if (process.env.MESK_TEST_UPGRADE && file >= "20261019130000_license_contract_periods.sql") continue;
+    if (process.env.MESK_TEST_UPGRADE === "before_collection" && file === "20261019093000_collection_methods.sql") continue;
     await db.exec(
       await readFile(
         new URL(`../supabase/migrations/${file}`, import.meta.url),
@@ -62,6 +66,10 @@ try {
       ),
     );
     console.log(`APPLIED ${file}`);
+  }
+  if (process.env.MESK_TEST_UPGRADE) {
+    await db.exec(await readFile(new URL("../supabase_business_upgrade_20261019.sql", import.meta.url),"utf8"));
+    console.log("APPLIED existing-installation business upgrade bundle");
   }
   const t1 = id(1),
     t2 = id(2),
@@ -93,6 +101,7 @@ try {
   insert into streets(id,tenant_id,district_id,name) values('${s1}','${t1}','${d1}','S1'),('${s2}','${t1}','${d2}','S2'),('${s3}','${t2}','${d3}','S3');
   insert into asset_types(id,tenant_id,category,name) values('${ty1}','${t1}','pole','T1'),('${ty2}','${t2}','pole','T2');
   insert into assets(id,tenant_id,code,street_id,type_id,geom,public_visible) values('${a1}','${t1}','A1','${s1}','${ty1}',st_setsrid(st_point(31.4,30.1),4326),true),('${a2}','${t1}','A2','${s2}','${ty1}',null,false),('${a3}','${t2}','B1','${s3}','${ty2}',null,true);
+  insert into licenses(tenant_id,asset_id,ref_no,issuer,expires_on) values('${t1}','${a1}','SEED-L1','Authority',current_date+1000),('${t1}','${a2}','SEED-L2','Authority',current_date+1000);
   insert into parties(id,tenant_id,type,name) values('${p1}','${t1}','advertiser','P1'),('${p2}','${t2}','advertiser','P2');
   insert into auth.users(id) values('${admin}'),('${viewer}'),('${manager}'),('${accountant}'),('${other}'),('${inspector}');
   insert into profiles(id,tenant_id,role,scope_district_id) values('${admin}','${t1}','admin',null),('${viewer}','${t1}','viewer',null),('${manager}','${t1}','area_manager','${d1}'),('${accountant}','${t1}','accountant',null),('${other}','${t2}','admin',null),('${inspector}','${t1}','inspector','${d1}');`);
@@ -178,6 +187,7 @@ try {
       `select create_upstream_contract('UP',current_date-30,current_date+100,'lump_sum',12000,'[{"asset_id":"${a1}","monthly_cost":1000},{"asset_id":"${a2}","monthly_cost":1000}]') id`,
     )
   ).rows[0].id;
+  await testLicensePeriods({sql,ok,rejects,as,admin,manager,other,t1,a1,a2,a3,p1});
   const contractSql = (
     asset = a1,
     start = "current_date",
@@ -421,6 +431,7 @@ try {
   });
   await testAssetMedia({db,sql,as,ok,rejects,t1,t2,admin,viewer,manager,inspector,other,a1,a2});
   await testCollectionMethods({sql,as,ok,rejects,admin,viewer,other,t1,p1});
+  await testBusinessJourney({sql,as,ok,rejects,admin,manager,other,t1,a1,a2,p1,d1,d2,ty1});
   console.log(
     `\n${checks} database assertions passed. Auth and Storage platform schemas are test fixtures.`,
   );

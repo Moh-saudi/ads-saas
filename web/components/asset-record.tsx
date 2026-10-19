@@ -1,4 +1,5 @@
 "use client";
+import { AssetPreparation } from "./asset-preparation";
 import { AssetPhotos } from "./asset-photos";
 import { AssetLocation } from "./asset-location";
 import { MapPin } from "lucide-react";
@@ -66,6 +67,7 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
         return [<span key={r.id}>{c?.ref_no || "عقد"}<small>{party?.name || "—"}</small></span>, `${date(r.start_date)} — ${date(r.end_date)}`, egp(r.monthly_price), statuses[r.status] || r.status];
       })}/>
     </details>
+    <AssetPreparation asset={a} data={d} canFinance={canFinance} />
     <details className="asset-section"><summary>التركيب والصيانة · {work.length}</summary>
       <GridTable columns={["أمر العمل", "المسؤول", "الاستحقاق", "الحالة / الإغلاق"]} rows={work.map((r) => [
         <span key={r.id}>{r.ref_no}<small>{r.title}</small></span>, o.employeeDirectory.find((e) => e.id === r.assigned_employee_id)?.full_name || "غير مسند",
@@ -76,7 +78,7 @@ export function AssetRecord({ asset: a, data: d, canEdit, canFinance }: {
       <GridTable columns={["التاريخ", "حالة اللوحة", "طريقة الفحص", "الملاحظات"]} rows={inspections.map((r) => [date(r.checked_at), <State key={r.id} value={r.condition}/>, r.method === "manual" ? "يدوي" : r.method.toUpperCase(), r.notes || "—"])}/>
     </details>
     <details className="asset-section"><summary>التراخيص · {licenses.length}</summary>
-      <GridTable columns={["المرجع", "الجهة المصدرة", "الانتهاء"]} rows={licenses.map((r) => [r.ref_no,r.issuer,date(r.expires_on)])}/>
+      <GridTable columns={["المرجع", "الجهة المصدرة", "البداية", "الانتهاء", "الحالة"]} rows={licenses.map((r) => [r.ref_no,r.issuer,date(r.valid_from),date(r.expires_on),r.status === "revoked" ? "ملغي" : "نشط"]) }/>
     </details>
     <details className="asset-section"><summary>المعدات وحركات المخزون · {stock.length}</summary>
       <GridTable columns={["المرجع", "الصنف", "الحركة", "الكمية", ...(canFinance ? ["القيمة"] : [])]} rows={stock.map((r) => [

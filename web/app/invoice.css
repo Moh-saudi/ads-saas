@@ -71,3 +71,5 @@
  .invoice-signatures { margin-top:6mm; }
  .invoice-document footer { margin-top:5mm; }
 }
+.receipt-signatures { display:flex; justify-content:space-between; gap:20px; margin-top:30mm; }
+.invoice-brand .code { overflow-wrap:anywhere; }

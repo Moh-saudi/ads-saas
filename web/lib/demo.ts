@@ -40,6 +40,7 @@ export function demoData(): WorkspaceData {
     street_id: streets[i % 3].id,
     street_name: streets[i % 3].name,
     district_name: i % 3 === 2 ? "مدينة الشروق" : "التجمع الخامس",
+    type_id: i % 3 === 0 ? "t2" : "t1",
     type_name: i % 3 === 0 ? "لوحة طرق" : "عمود إعلاني",
     live_status:
       i < 3
@@ -93,6 +94,18 @@ export function demoData(): WorkspaceData {
     asset_id: a.id, start_date: date(-15), end_date: a.lease_end!,
     monthly_price: a.monthly_price!, status: "active",
   }));
+  operations.upstreamCoverage = assets.map((a,i)=>({id:`cov${i}`,asset_id:a.id,upstream_contract_id:"u1",valid_from:date(-120),valid_to:date(240),monthly_cost:a.monthly_cost}));
+  operations.pricingRules = [
+    {id:"rate1",district_id:"d1",type_id:"t1",monthly_price:5000,valid_from:date(-365),valid_to:date(365)},
+    {id:"rate2",district_id:"d1",type_id:"t2",monthly_price:12000,valid_from:date(-365),valid_to:date(365)},
+    {id:"rate3",district_id:"d2",type_id:"t1",monthly_price:4500,valid_from:date(-365),valid_to:date(365)},
+  ];
+  operations.payments = operations.cashTransactions.filter(t=>t.ref_no.startsWith("RCPT-")).map((t,i)=>({id:`receipt-${i+1}`,invoice_id:"f1",amount:t.amount,paid_on:t.transaction_date,reference:t.ref_no,payment_method:t.payment_method||"unknown",cash_account_id:t.cash_account_id}));
+  const authorityPayment=operations.cashTransactions.find(t=>t.kind==="payment"&&t.description.includes("PAY-001"));
+  if(authorityPayment)operations.payments.push({id:"receipt-authority",invoice_id:"f2",amount:authorityPayment.amount,paid_on:authorityPayment.transaction_date,reference:authorityPayment.ref_no,payment_method:authorityPayment.payment_method||"unknown",cash_account_id:authorityPayment.cash_account_id});
+  operations.purchases = operations.purchases.map(p=>({...p,asset_id:p.id==="po1"?"a0":"a8",work_order_id:p.id==="po1"?"w1":"w3",procurement_kind:p.id==="po1"?"external_manufacture":"purchase"}));
+  operations.workOrders = operations.workOrders.map(w=>({...w,kind:w.id==="w3"?"installation":"maintenance",planned_start:w.id==="w3"?date(-4):date(0)}));
+  operations.items = operations.items.map(i=>({...i,length_m:i.id==="it1"?2:null,width_m:i.id==="it1"?1:null,material:i.id==="it1"?"حديد مجلفن":null}));
   const contractTotal = (id: string) => operations.contractLines.filter(l => l.contract_id === id).reduce((sum,l) => sum + Math.round(l.monthly_price * ((Date.parse(l.end_date) - Date.parse(l.start_date)) / 86400000 + 1) / 30 * 100), 0) / 100;
   const revenue = assets.reduce((s, a) => s + (a.monthly_price || 0), 0),
     cost = assets.reduce((s, a) => s + a.monthly_cost, 0);
@@ -192,7 +205,7 @@ export function demoData(): WorkspaceData {
         status: "paid",
       },
     ],
-    licenses: assets.map((a,i) => ({ id:`l${i+1}`, asset_id:a.id, ref_no:`LIC-${101+i}`, issuer:i%3===2?"جهة الشروق — مثال":"جهة القاهرة الجديدة — مثال", expires_on:date(i===0?30:240) })),
+    licenses: assets.map((a,i) => ({ id:`l${i+1}`, asset_id:a.id, ref_no:`LIC-${101+i}`, valid_from:date(-365), status:"active" as const, issuer:i%3===2?"جهة الشروق — مثال":"جهة القاهرة الجديدة — مثال", expires_on:date(i===0?30:240) })),
     upstream: [
       {
         id: "u1",

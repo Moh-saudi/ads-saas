@@ -41,6 +41,13 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { FormDialog as Modal } from "./form-dialog";
+import { CompanySetup } from "./company-setup";
+import { CustomerStatement } from "./customer-statement";
+import { BookingCalendar } from "./booking-calendar";
+import { ContractBookingFields } from "./contract-booking-fields";
+import { PricingPanel } from "./pricing-profitability";
+import { LicenseCompliance } from "./license-compliance";
+import { cairoDay } from "@/lib/license-periods.mjs";
 import { LocationHierarchy } from "./location-hierarchy";
 import { GuidedTour } from "./guided-tour";
 import { WorkflowGuide } from "./workflow-guide";
@@ -441,7 +448,7 @@ export function Workspace({
             <Empty text="هذه الشاشة مخصصة لمدير النظام." />
           ) : (
             <>
-              {section === "guide" && <WorkflowGuide demo={d.demo} />}
+              {section === "guide" && <><CompanySetup data={d} /><WorkflowGuide demo={d.demo} /></>}
               {(operationSections as readonly string[]).includes(section) && (
                 <Operations key={section} data={d} section={section} />
               )}
@@ -734,7 +741,7 @@ export function Workspace({
                   </p>
                 </section>
               )}
-              {section === "contracts" && <ContractOperations data={d} />}
+              {section === "contracts" && <><BookingCalendar data={d} /><PricingPanel data={d} /><ContractOperations data={d} /></>}
               {section === "upstream" && (
                 <ContractOperations data={d} upstream />
               )}
@@ -860,7 +867,7 @@ export function Workspace({
               )}
               {section === "finance" && (
                 <>
-                  {canFinance && <CollectionChart rows={d.operations.cashTransactions} />}
+                  {canFinance && <><CollectionChart rows={d.operations.cashTransactions} /><CustomerStatement data={d} /></>}
                   <div className="kpi-grid three">
                     <Kpi
                       title="مطلوب تحصيله"
@@ -961,13 +968,15 @@ export function Workspace({
                 </>
               )}
               {section === "licenses" && (
-                <section className="card">
+                <><LicenseCompliance data={d} /><section className="card">
                   <Table
                     headings={[
                       "رقم الترخيص",
                       "اللوحة",
                       "جهة الإصدار",
+                      "بداية الصلاحية",
                       "انتهاء الصلاحية",
+                      "حالة التصريح",
                     ]}
                   >
                     {d.licenses.map((l) => (
@@ -978,11 +987,13 @@ export function Workspace({
                             "—"}
                         </td>
                         <td>{l.issuer}</td>
+                        <td>{l.valid_from ? formatDate(l.valid_from) : "لم تُسجل — سجل قديم"}</td>
                         <td>{formatDate(l.expires_on)}</td>
+                        <td>{l.status === "revoked" ? "ملغي" : l.expires_on < cairoDay() ? "منتهي" : l.valid_from && l.valid_from > cairoDay() ? "لم يبدأ" : "ساري"}</td>
                       </tr>
                     ))}
                   </Table>
-                </section>
+                </section></>
               )}
               {section === "conflicts" && (
                 <>
@@ -1388,6 +1399,7 @@ function Select({
   );
 }
 function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: WorkspaceData; initialStreet?: string }) {
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [assetPoint, setAssetPoint] = useState<MapPoint | null>(null);
   const clearAssetPoint = useCallback(() => setAssetPoint(null), []);
   const assetCenter = d.assets.find((asset) => asset.latitude != null && asset.longitude != null);
@@ -1493,7 +1505,7 @@ function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: Workspac
       {actual === "contract" && (
         <>
           <div className="notice">
-            يفحص النظام تغطية عقد استغلال المواقع ويمنع الحجز المزدوج قبل حفظ العقد
+            يفحص النظام صلاحية تصاريح اللوحات وتغطية حق الاستغلال ويمنع الحجز المزدوج قبل حفظ العقد
             بالكامل.
           </div>
           <Select
@@ -1502,32 +1514,13 @@ function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: Workspac
             rows={d.parties.filter((p) => p.type === "advertiser")}
           />
           <Field label="رقم العقد" name="ref_no" />
-          <div className="form-grid">
-            <Field label="تاريخ البداية" name="start_date" type="date" />
-            <Field label="تاريخ النهاية (شامل)" name="end_date" type="date" />
-          </div>
-          <Select
-            label="اللوحات"
-            name="asset_id"
-            rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({
-              id: a.id,
-              name: `${a.code} · ${a.street_name}`,
-            }))}
-            multiple
-          />
-          <Field
-            label="الإيجار الشهري لكل لوحة (ج.م)"
-            name="monthly_price"
-            type="number"
-            min="0"
-            step="0.01"
-          />
+          <ContractBookingFields data={d} />
           {d.profile.role === "admin" && (
             <label>
-              سبب الاستثناء من التغطية (اختياري)
+              سبب الاستثناء من حق الاستغلال فقط (اختياري)
               <textarea
                 name="override_reason"
-                placeholder="اتركه فارغًا للتطبيق العادي. الاستثناء يُسجل باسمك."
+                placeholder="الاستثناء يُسجل باسمك، ولا يسمح بتجاوز صلاحية تصريح اللوحة."
                 minLength={10}
               />
             </label>
@@ -1574,7 +1567,7 @@ function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: Workspac
       )}
       {actual === "payment" && (
         <>
-          <PaymentMethodField />
+          <PaymentMethodField onChange={setPaymentMethod} />
           <input type="hidden" name="invoice_id" value={invoice?.id || ""} />
           <div className="notice">
             الفاتورة {invoice?.ref_no} · المتبقي{" "}
@@ -1596,19 +1589,21 @@ function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: Workspac
               name: `${c.name} · ${money(c.balance)}`,
             }))}
           />
-          <Field label="مرجع الدفع" name="reference" required={false} />
+          <Field label="مرجع التحويل / الإيصال" name="reference" required={["bank_transfer","instapay","vodafone_cash","card"].includes(paymentMethod)} />
         </>
       )}
       {actual === "invoice" && <ItemizedInvoiceFields data={d} />}
       {actual === "license" && (
         <>
           <Select
-            label="اللوحة"
+            label="اللوحات المشمولة بالتصريح"
             name="asset_id"
+            multiple
             rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({ id: a.id, name: a.code }))}
           />
           <Field label="رقم الترخيص" name="ref_no" />
           <Field label="جهة الإصدار" name="issuer" />
+          <Field label="بداية صلاحية التصريح" name="valid_from" type="date" />
           <Field label="تاريخ الانتهاء" name="expires_on" type="date" />
         </>
       )}

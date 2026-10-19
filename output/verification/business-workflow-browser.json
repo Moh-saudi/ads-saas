@@ -1,0 +1,30 @@
+[
+  {
+    "width": 1440,
+    "setupProgress": true,
+    "multiAssetPermit": true,
+    "linkedProcurement": true,
+    "calendarDetails": true,
+    "perBillboardPrice": true,
+    "licensePreview": true,
+    "profitRows": 18,
+    "customerReceipts": 5,
+    "electronicReferenceRequired": true,
+    "printableReceipt": true,
+    "demoSavingDisabled": true
+  },
+  {
+    "width": 390,
+    "setupProgress": true,
+    "multiAssetPermit": true,
+    "linkedProcurement": true,
+    "calendarDetails": true,
+    "perBillboardPrice": true,
+    "licensePreview": true,
+    "profitRows": 18,
+    "customerReceipts": 5,
+    "electronicReferenceRequired": true,
+    "printableReceipt": true,
+    "demoSavingDisabled": true
+  }
+]

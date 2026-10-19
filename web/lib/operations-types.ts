@@ -39,6 +39,7 @@ export type Warehouse = {
   active: boolean;
 };
 export type Item = {
+  length_m?: number | null; width_m?: number | null; material?: string | null;
   id: string;
   sku: string;
   name: string;
@@ -75,6 +76,7 @@ export type StockMove = {
   return_of: string | null;
 };
 export type Purchase = {
+  asset_id?: string | null; work_order_id?: string | null; procurement_kind?: string;
   id: string;
   ref_no: string;
   supplier_id: string;
@@ -92,6 +94,7 @@ export type PurchaseLine = {
   unit_cost: number;
 };
 export type WorkOrder = {
+  kind?: string; planned_start?: string | null;
   id: string;
   ref_no: string;
   asset_id: string;
@@ -236,7 +239,13 @@ export type ContractLine = {
   monthly_price: number;
   status: string;
 };
+export type PricingRule = { id:string; district_id:string; type_id:string; monthly_price:number; valid_from:string; valid_to:string };
+export type Coverage = { id:string; asset_id:string; upstream_contract_id:string; valid_from:string; valid_to:string; monthly_cost:number };
+export type Receipt = { id:string; invoice_id:string; amount:number; paid_on:string; reference:string|null; payment_method?:string; cash_account_id?:string|null };
 export type OperationsData = {
+  pricingRules: PricingRule[];
+  upstreamCoverage: Coverage[];
+  payments: Receipt[];
   tenantUsers: { id: string; full_name: string; role: string }[];
   installments: Installment[];
   contractLines: ContractLine[];
@@ -266,6 +275,7 @@ export type OperationsData = {
   assetTags: AssetTag[];
 };
 export const emptyOperations: OperationsData = {
+  pricingRules: [], upstreamCoverage: [], payments: [],
   tenantUsers: [],
   installments: [],
   contractLines: [],

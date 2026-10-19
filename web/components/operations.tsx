@@ -1,4 +1,5 @@
 "use client";
+import { BookingCalendar } from "./booking-calendar";
 import { paymentMethodLabel } from "@/lib/payment-methods.mjs";
 import { useState, useMemo, useEffect } from "react";
 import {
@@ -523,10 +524,10 @@ export function Operations({
           {tab === "items" && (
             <Panel title="دليل المعدات والخامات">
               <GridTable
-                columns={["SKU", "الصنف", "الوحدة", "حد إعادة الطلب"]}
+                columns={["SKU", "الصنف", "المقاس (م)", "الخامة", "الوحدة", "حد إعادة الطلب"]}
                 rows={o.items
                   .filter(matches)
-                  .map((i) => [i.sku, i.name, i.unit, fmt(i.reorder_level)])}
+                  .map((i) => [i.sku, i.name, i.length_m && i.width_m ? `${i.length_m} × ${i.width_m}` : "غير مسجل", i.material || "—", i.unit, fmt(i.reorder_level)])}
               />
             </Panel>
           )}
@@ -535,16 +536,17 @@ export function Operations({
       {section === "purchases" && (
         <>
           {tools(
-            stock && <Add onClick={() => open("purchase")}>أمر شراء جديد</Add>,
+            stock && <Add onClick={() => open("purchase")}>طلب شراء / تصنيع</Add>,
           )}
           <Panel
-            title="أوامر الشراء والتوريد"
+            title="طلبات الشراء والتصنيع لدى الموردين"
             subtitle="الاستلام يزيد المخزون، ثم تُنشأ فاتورة المورد من الأمر نفسه مرة واحدة"
           >
             <GridTable
               columns={[
                 "المرجع",
                 "المورد",
+                "الغرض / اللوحة",
                 "المخزن",
                 "تاريخ الطلب",
                 "القيمة",
@@ -554,6 +556,7 @@ export function Operations({
               rows={o.purchases.filter(matches).map((p) => [
                 p.ref_no,
                 d.parties.find((a) => a.id === p.supplier_id)?.name || "—",
+                `${p.procurement_kind === "external_manufacture" ? "تصنيع لدى المورد" : "شراء"} · ${asset(p.asset_id || null)}`,
                 warehouse(p.warehouse_id),
                 date(p.ordered_on),
                 egp(
@@ -581,6 +584,7 @@ export function Operations({
       )}
       {section === "maintenance" && (
         <>
+          <BookingCalendar data={d} />
           <div className="ops-metrics">
             <Mini
               label="أوامر مفتوحة"

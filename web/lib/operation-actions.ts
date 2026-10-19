@@ -115,6 +115,7 @@ export async function operationMutation(
           sku: s("sku"),
           name: s("name"),
           unit: s("unit"),
+          length_m: opt("length_m") ? n("length_m") : null, width_m: opt("width_m") ? n("width_m") : null, material: opt("material"),
           reorder_level: n("reorder_level"),
         });
     case "stock":
@@ -135,7 +136,7 @@ export async function operationMutation(
       const lines = JSON.parse(s("lines") || "[]");
       if (!Array.isArray(lines) || !lines.length || lines.length > 200)
         throw new Error("INVALID_LINES");
-      return db.rpc("create_purchase", {
+      return db.rpc("create_asset_purchase", {
         p_ref: s("ref_no"),
         p_supplier: s("supplier_id"),
         p_warehouse: s("warehouse_id"),
@@ -143,6 +144,7 @@ export async function operationMutation(
         p_expected: opt("expected_on"),
         p_lines: lines,
         p_notes: s("notes"),
+        p_asset: opt("asset_id"), p_work: opt("work_order_id"), p_kind: s("procurement_kind"),
       });
     }
     case "purchase_receive":
@@ -161,6 +163,7 @@ export async function operationMutation(
           ref_no: s("ref_no"),
           asset_id: s("asset_id"),
           title: s("title"),
+          kind: s("work_kind"), planned_start: opt("planned_start"),
           description: opt("description"),
           assigned_employee_id: opt("assigned_employee_id"),
           priority: s("priority"),
@@ -169,7 +172,7 @@ export async function operationMutation(
           created_by: user.id,
         });
     case "work_progress":
-      return db.rpc("progress_work_order", {
+      return db.rpc("progress_asset_work", {
         p_id: s("id"),
         p_status: s("status"),
         p_resolution: s("resolution"),

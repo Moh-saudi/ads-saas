@@ -27,6 +27,7 @@ export function OperationForm({
     purchase = o.purchases.find((p) => p.id === m.id),
     leave = o.leaves.find((l) => l.id === m.id),
     lead = o.enquiries.find((l) => l.id === m.id);
+  const [purchaseAsset, setPurchaseAsset] = useState("");
   const [stockKind, setStockKind] = useState("receipt"),
     [cashKind, setCashKind] = useState("expense"),
     [chosenEmployee, setChosenEmployee] = useState(employee?.id || ""),
@@ -39,7 +40,7 @@ export function OperationForm({
       name: `${a.code} · ${a.street_name}`,
     })),
     warehouses = o.warehouses.map((w) => ({ id: w.id, name: w.name })),
-    items = o.items.map((i) => ({ id: i.id, name: `${i.sku} · ${i.name}` })),
+    items = o.items.map((i) => ({ id: i.id, name: `${i.sku} · ${i.name}${i.length_m && i.width_m ? ` · ${i.length_m}×${i.width_m} م` : ""}` })),
     cashAccounts = o.cashAccounts.map((c) => ({
       id: c.id,
       name: `${c.name} · ${egp(c.balance)}`,
@@ -394,6 +395,7 @@ export function OperationForm({
           <Field name="sku" label="كود الصنف SKU" />
           <Field name="name" label="اسم الصنف" />
           <Field name="unit" label="وحدة القياس" value="قطعة" />
+          <div className="form-grid"><Field name="length_m" label="الطول بالمتر (اختياري)" type="number" min="0.01" required={false} /><Field name="width_m" label="العرض بالمتر (اختياري)" type="number" min="0.01" required={false} /></div><Field name="material" label="الخامة / المواصفات" required={false} />
           <Field
             name="reorder_level"
             label="حد إعادة الطلب"
@@ -485,7 +487,11 @@ export function OperationForm({
       )}
       {kind === "purchase" && (
         <>
-          <Field name="ref_no" label="رقم أمر الشراء" />
+          <Field name="ref_no" label="رقم أمر التوريد" />
+          <Pick name="procurement_kind" label="نوع الطلب" value="purchase" options={[{id:"purchase",name:"شراء جاهز"},{id:"external_manufacture",name:"تصنيع لدى المورد"}]} />
+          <label>اللوحة المخصصة لها المعدات (اختياري)<select name="asset_id" value={purchaseAsset} onChange={e=>setPurchaseAsset(e.target.value)}><option value="">توريد عام للمخزن</option>{assets.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
+          <Pick key={purchaseAsset} name="work_order_id" label="أمر التركيب المرتبط (اختياري)" required={false} options={o.workOrders.filter(w=>w.asset_id===purchaseAsset && !["completed","cancelled"].includes(w.status)).map(w=>({id:w.id,name:`${w.ref_no} · ${w.title}`}))} />
+          <p className="subtle">التصنيع هنا لدى مورد خارجي. الاستلام يضيف للمخزن؛ تركيب المعدات على اللوحة يحتاج حركة صرف مرتبطة باللوحة وأمر التركيب.</p>
           <Pick
             name="supplier_id"
             label="المورد"
@@ -543,6 +549,8 @@ export function OperationForm({
         <>
           <Field name="ref_no" label="رقم أمر العمل" />
           <Field name="title" label="المهمة المطلوبة" />
+          <Pick name="work_kind" label="نوع أمر العمل" value="installation" options={[{id:"installation",name:"تركيب"},{id:"removal",name:"فك الإعلان"},{id:"maintenance",name:"صيانة"}]} />
+          <Field name="planned_start" label="بداية التنفيذ المخططة" type="date" required={false} />
           <Pick name="asset_id" label="اللوحة" options={assets} />
           <Pick
             name="assigned_employee_id"

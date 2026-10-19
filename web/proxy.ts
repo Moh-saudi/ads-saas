@@ -10,7 +10,7 @@ export async function proxy(request: NextRequest) {
   headers.delete("x-tenant-name");
   const path = request.nextUrl.pathname;
   // These routes render fixtures only and must not depend on the hosted tenant lookup.
-  if (path === "/demo" || path.startsWith("/demo/") || path === "/demo-site" || path.startsWith("/demo-invoice/") || !configured) {
+  if (path === "/demo" || path.startsWith("/demo/") || path === "/demo-site" || path.startsWith("/demo-receipt/") || path.startsWith("/demo-invoice/") || !configured) {
     return NextResponse.next({ request: { headers } });
   }
   // The Host header is mapped to an explicitly verified domain; forwarded tenant headers are never trusted.

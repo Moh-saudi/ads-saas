@@ -38,6 +38,15 @@ export async function logout() {
 
 function friendly(message: string, code?: string) {
   const messages: Record<string, string> = {
+    INVALID_LINES: "اختر لوحة واحدة على الأقل وأدخل سعرًا صحيحًا لكل بند.",
+    INVALID_PERIOD: "راجع تاريخ البداية والنهاية؛ النهاية لا تسبق البداية.",
+    INVALID_PRICE: "أدخل سعرًا شهريًا صحيحًا لا يقل عن صفر.",
+    INVALID_PROCUREMENT_WORK: "أمر العمل يجب أن يكون مفتوحًا ومرتبطًا بنفس اللوحة المختارة.",
+    INVALID_PROCUREMENT_KIND: "اختر الشراء أو التصنيع لدى المورد.",
+    LICENSE_PERIOD_CONFLICT: "مدة الإعلان غير مغطاة بتصريح ساري لكل لوحة. أضف التصريح أو جدّده قبل الحفظ؛ استثناء حق الاستغلال لا يتجاوز التصريح.",
+    LICENSE_HAS_ACTIVE_BOOKINGS: "لا يمكن تقصير أو إلغاء تصريح تعتمد عليه حجوزات قائمة. أضف تصريح التجديد أولًا أو عدّل الحجوزات.",
+    INVALID_LICENSE_PERIOD: "أدخل بداية ونهاية صحيحتين لصلاحية التصريح.",
+    INVALID_LICENSE: "اختر اللوحات وأدخل رقم التصريح وجهة الإصدار.",
     INVALID_WEBSITE_URL: "استخدم رابط HTTPS صحيحًا للصورة أو الموقع أو الخريطة.",
     INVALID_WEBSITE_CONTENT: "راجع العناوين وبيانات أقسام الموقع والحد الأقصى لعدد العناصر.",
     PAYMENT_METHOD_REQUIRED: "اختر طريقة التحصيل أو الدفع قبل الحفظ.",
@@ -68,13 +77,19 @@ function friendly(message: string, code?: string) {
     REASON_REQUIRED: "أدخل سببًا واضحًا لتوثيق الإجراء.",
     UNBALANCED_JOURNAL: "القيد غير متوازن. لم تُحفظ الحركة.",
   };
+  if (["PGRST204","PGRST205"].includes(code || "")) return "يلزم تطبيق ملف تحديث دورة العمل الأخير على سوبابيز قبل استخدام هذه الإضافة.";
+  if (code === "PGRST202" && /create_asset_purchase|progress_asset_work/.test(message)) return "يلزم تطبيق تحديث ربط تجهيز اللوحات على سوبابيز أولًا.";
+  if (code === "PGRST202" && /register_asset_licenses/.test(message)) return "يلزم تطبيق تحديث صلاحية التراخيص على سوبابيز أولًا.";
   if (code === "PGRST202" && /record_invoice_payment_with_method|create_cash_transaction_with_method/.test(message)) return "يلزم تفعيل تحديث طرق التحصيل على قاعدة البيانات أولًا. تواصل مع مدير النظام ثم أعد المحاولة.";
   const known = Object.keys(messages).find((key) => message.includes(key));
   if (known) return messages[known];
   if (message.includes("CHAIN_CONFLICT"))
     return "مدة إعلان العميل تتجاوز مدة استغلال الموقع المتاحة. عدّل المدة أو جدّد عقد استغلال الموقع قبل الحفظ.";
+  if (code === "23P01" && message.includes("pricing_rules"))
+    return "توجد أسعار مسجلة لنفس المنطقة والنوع خلال هذه الفترة. اختر فترة غير متداخلة.";
   if (code === "23P01")
     return "العنصر محجوز خلال هذه الفترة. اختر فترة أو عنصرًا آخر.";
+  if (message.includes("electronic_payment_reference")) return "أدخل مرجع التحويل البنكي أو إنستا باي أو المحفظة أو البطاقة قبل تسجيل التحصيل.";
   if (code === "23505") return "الرقم أو الكود مستخدم بالفعل داخل الشركة.";
   if (code === "42501" || message.includes("FORBIDDEN"))
     return "لا تملك صلاحية إجراء هذا التغيير أو يقع العنصر خارج نطاقك.";
@@ -98,6 +113,7 @@ export async function mutate(
     asset: "assets",
     party: "customers",
     contract: "customer_contracts",
+    pricing_rule: "customer_contracts",
     invoice: "finance",
     payment: "finance",
     license: "licenses",
@@ -180,13 +196,16 @@ export async function mutate(
         }
         break;
       }
+      case "pricing_rule":
+        result = await db.from("pricing_rules").insert({tenant_id:brand.id,district_id:str("district_id"),type_id:str("type_id"),monthly_price:num("monthly_price"),valid_from:str("valid_from"),valid_to:str("valid_to")});
+        break;
       case "contract":
         result = await db.rpc("create_customer_contract", {
           p_customer_id: str("customer_id"),
           p_ref_no: str("ref_no"),
           p_start: str("start_date"),
           p_end: str("end_date"),
-          p_lines: form.getAll("asset_id").map((id) => ({
+          p_lines: str("contract_lines") ? JSON.parse(str("contract_lines")) : form.getAll("asset_id").map((id) => ({
             asset_id: String(id),
             monthly_price: num("monthly_price"),
           })),
@@ -216,12 +235,10 @@ export async function mutate(
         });
         break;
       case "license":
-        result = await db.from("licenses").insert({
-          tenant_id: brand.id,
-          asset_id: str("asset_id"),
-          ref_no: str("ref_no"),
-          issuer: str("issuer"),
-          expires_on: str("expires_on"),
+        result = await db.rpc("register_asset_licenses", {
+          p_assets: form.getAll("asset_id").map(String),
+          p_ref: str("ref_no"), p_issuer: str("issuer"),
+          p_start: str("valid_from"), p_end: str("expires_on"),
         });
         break;
       case "governorate":

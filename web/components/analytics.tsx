@@ -1,4 +1,5 @@
 "use client";
+import { AssetProfitability } from "./pricing-profitability";
 import { CollectionChart } from "./collection-chart";
 import { useMemo, useState } from "react";
 import { ArrowDownToLine } from "lucide-react";
@@ -60,6 +61,7 @@ export function Analytics({
   );
   return (
     <div className="analytics-area">
+      {full && <AssetProfitability data={d} />}
       <div className="analytics-toolbar">
         <div>
           <h2>{full ? "تقارير الأعمال والأداء" : "أداء أعمالك بالأرقام"}</h2>
