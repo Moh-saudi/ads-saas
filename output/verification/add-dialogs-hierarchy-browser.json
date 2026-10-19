@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1440,
+    "cascade": true,
+    "resetChildren": true,
+    "inlineCreation": true,
+    "preservedDraft": true,
+    "escapeClosesOnlyChild": true,
+    "demoSaveDisabled": true,
+    "noOverflow": true,
+    "filteredDirectory": true,
+    "streetCarriedIntoBillboard": true
+  },
+  {
+    "width": 390,
+    "cascade": true,
+    "resetChildren": true,
+    "inlineCreation": true,
+    "preservedDraft": true,
+    "escapeClosesOnlyChild": true,
+    "demoSaveDisabled": true,
+    "noOverflow": true,
+    "filteredDirectory": true,
+    "streetCarriedIntoBillboard": true
+  }
+]

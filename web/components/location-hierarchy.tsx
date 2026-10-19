@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { DataForm } from "./forms";
 import type { WorkspaceData } from "@/lib/types";
@@ -56,13 +57,13 @@ export function LocationHierarchy({ d, required = true, onStreetChange, onHierar
       {level.enabled && !level.rows.length && <small>لا توجد بيانات هنا بعد.{canManage ? " أضفها من الزر أعلاه." : " اطلب من مسؤول الشركة إضافتها."}</small>}
     </div>)}</div>
     {adding && createPortal(<dialog ref={dialog} className="modal location-dialog" onCancel={() => setAdding(null)} aria-labelledby="location-dialog-title">
-      <div className="modal-head"><h2 id="location-dialog-title">إضافة {labels[adding]}</h2><button type="button" className="button secondary" onClick={() => setAdding(null)} aria-label="إغلاق">إغلاق</button></div>
-      <p>{governorates.find(x => x.id === governorate)?.name}{adding === "street" ? ` ← ${districts.find(x => x.id === district)?.name ?? ""}` : ""}</p>
+      <div className="modal-head"><h2 id="location-dialog-title">إضافة {labels[adding]}</h2><button type="button" className="icon-button" onClick={() => setAdding(null)} aria-label="إغلاق"><X size={21} /></button></div>
+      <div className="modal-body"><p>{governorates.find(x => x.id === governorate)?.name}{adding === "street" ? ` ← ${districts.find(x => x.id === district)?.name ?? ""}` : ""}</p>
       <DataForm kind={adding} demo={d.demo} onSuccess={saved} label="حفظ واختيار هذا الموقع">
         <label>اسم {labels[adding]}<input name="name" required autoFocus value={name} onChange={event => setName(event.target.value)} /></label>
         {adding === "district" && <input type="hidden" name="governorate_id" value={governorate} />}
         {adding === "street" && <><input type="hidden" name="district_id" value={district} /><label>نطاق التعاقد<select name="holding" value={holding} onChange={event => setHolding(event.target.value)}><option value="partial">مواقع متفرقة</option><option value="full">الشارع بالكامل</option></select></label></>}
-      </DataForm>
+      </DataForm></div>
     </dialog>, document.body)}
   </fieldset>;
 }

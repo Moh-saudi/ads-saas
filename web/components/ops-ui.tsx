@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useRef, type ReactNode } from "react";
-import { X, Layers, Plus } from "lucide-react";
+import { type ReactNode } from "react";
+import { Layers, Plus } from "lucide-react";
 export const fmt = (n: unknown) =>
   new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(
     Number(n || 0),
@@ -244,68 +244,7 @@ export function Note({
     </label>
   );
 }
-export function Dialog({
-  title,
-  children,
-  onClose,
-}: {
-  title: string;
-  children: ReactNode;
-  onClose: () => void;
-}) {
-  const ref = useRef<HTMLElement>(null),
-    close = useRef(onClose);
-  close.current = onClose;
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    ref.current?.querySelector<HTMLElement>("button")?.focus();
-    const handle = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close.current();
-      if (e.key === "Tab") {
-        const nodes = Array.from(
-          ref.current?.querySelectorAll<HTMLElement>(
-            "button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href]",
-          ) || [],
-        );
-        if (e.shiftKey && document.activeElement === nodes[0]) {
-          e.preventDefault();
-          nodes.at(-1)?.focus();
-        } else if (!e.shiftKey && document.activeElement === nodes.at(-1)) {
-          e.preventDefault();
-          nodes[0]?.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handle);
-    return () => {
-      document.body.style.overflow = overflow;
-      document.removeEventListener("keydown", handle);
-      previous?.focus();
-    };
-  }, []);
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <section
-        className="modal ops-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        ref={ref}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-head">
-          <h2>{title}</h2>
-          <button className="icon-button" onClick={onClose} aria-label="إغلاق">
-            <X size={21} />
-          </button>
-        </div>
-        {children}
-      </section>
-    </div>
-  );
-}
+export { FormDialog as Dialog } from "./form-dialog";
 export function exportCsv(
   filename: string,
   headings: string[],

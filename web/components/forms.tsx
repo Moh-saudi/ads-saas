@@ -42,14 +42,14 @@ export function DataForm({
           {state.message}
         </div>
       )}
-      <button
+      <div className="form-actions"><button
         className="button primary"
         type="submit"
         disabled={pending || demo || disabled}
       >
         {pending ? <LoaderCircle size={18} className="spin" /> : null}
         {pending ? "جارٍ الحفظ…" : label}
-      </button>
+      </button></div>
     </form>
   );
 }
