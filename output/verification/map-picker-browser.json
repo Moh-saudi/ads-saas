@@ -1,0 +1,33 @@
+[
+  {
+    "width": 1440,
+    "passed": [
+      "no default coordinate saved",
+      "map click sets coordinates",
+      "drag marker changes coordinates",
+      "coordinate jump",
+      "simulated GPS success and denial",
+      "late GPS cannot overwrite manual selection",
+      "form fields match point",
+      "demo saving disabled",
+      "clear and reopen reset point",
+      "no horizontal overflow"
+    ],
+    "tileImages": "blocked during test; live egress not verified"
+  },
+  {
+    "width": 390,
+    "passed": [
+      "no default coordinate saved",
+      "map click sets coordinates",
+      "coordinate jump",
+      "simulated GPS success and denial",
+      "late GPS cannot overwrite manual selection",
+      "form fields match point",
+      "demo saving disabled",
+      "clear and reopen reset point",
+      "no horizontal overflow"
+    ],
+    "tileImages": "blocked during test; live egress not verified"
+  }
+]

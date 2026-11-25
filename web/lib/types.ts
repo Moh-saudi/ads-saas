@@ -15,6 +15,7 @@ export type Brand = {
   public_site_enabled: boolean;
 };
 export type Asset = {
+  type_id?: string;
   status?: "active" | "maintenance" | "retired";
   cost?: number | null;
   install_date?: string | null;
@@ -79,6 +80,8 @@ export type FinanceRow = {
   status: string;
 };
 export type License = {
+  valid_from?: string | null;
+  status?: "active" | "revoked";
   id: string;
   asset_id: string;
   ref_no: string;

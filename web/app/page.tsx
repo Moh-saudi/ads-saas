@@ -6,15 +6,24 @@ import { normalizeHost } from "@/lib/host";
 import { headers } from "next/headers";
 import { PublicSite } from "@/components/public-site";
 import { demoData, demoBrand } from "@/lib/demo";
+import { shareMetadata, siteDescription, defaultSiteOrigin, showcaseMetadata } from "@/lib/share-metadata";
+import { isShowcaseHost } from "@/lib/showcase-host";
+import { ProductShowcase } from "@/components/product-showcase";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   try {
+    if (isShowcaseHost((await headers()).get("host") || "")) return showcaseMetadata();
     const brand = await getBrand();
+    const name = brand?.name || "مِسك للإعلان";
+    const title = brand?.website_title ? `${name} | ${brand.website_title}` : `${name} | حلول الإعلان الخارجي`;
+    const description = brand?.website_description || siteDescription;
+    const host = normalizeHost((await headers()).get("host") || "");
     return {
-      title: brand?.website_title || brand?.name || "منصة إدارة اللافتات الذكية",
-      description: brand?.website_description || "",
+      ...shareMetadata({ origin: brand && host ? `https://${host}` : defaultSiteOrigin, title, description, name, logo: brand?.logo_url }),
+      title: { absolute: title },
+      description,
     };
   } catch {
     return {
@@ -44,6 +53,9 @@ function renderDemoFallback() {
 }
 
 export default async function Home() {
+  const host = (await headers()).get("host") || "";
+  if (isShowcaseHost(host)) return <ProductShowcase />;
+
   if (!configured) {
     return renderDemoFallback();
   }
@@ -63,7 +75,7 @@ export default async function Home() {
     }
 
     const db = await createClient();
-    const h = normalizeHost((await headers()).get("host") || "");
+    const h = normalizeHost(host);
     const [catalog, website] = await Promise.all([
       db.rpc("public_catalog", { h }),
       db.rpc("public_website", { p_host: h }),

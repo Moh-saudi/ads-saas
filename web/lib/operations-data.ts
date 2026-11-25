@@ -31,6 +31,8 @@ export async function loadOperations(
 ): Promise<OperationsData> {
   const mapping: Record<string, string> = {
     employees: "employees",
+    upstreamCoverage: "upstream_contract_assets",
+    payments: "payments",
     attendance: "attendance",
     leaves: "leave_requests",
     warehouses: "warehouses",
@@ -70,6 +72,8 @@ export async function loadOperations(
       ] as const;
     }),
   );
+  const pricing = await db.from("pricing_rules").select("id").eq("tenant_id", tenant).limit(0);
+  if (pricing.error && !["PGRST205", "42P01"].includes(pricing.error.code)) throw new Error(pricing.error.message);
   const [directory, users] = await Promise.all([
     db.rpc("employee_directory"),
     db.rpc("tenant_user_directory"),
@@ -79,6 +83,7 @@ export async function loadOperations(
   return {
     ...emptyOperations,
     ...Object.fromEntries(entries),
+    pricingRules: pricing.error ? [] : await readTenantRows<OperationsData["pricingRules"][number]>(db,"pricing_rules",tenant),
     employeeDirectory: directory.data || [],
     tenantUsers: users.data || [],
   } as OperationsData;

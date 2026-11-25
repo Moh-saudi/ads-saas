@@ -1,0 +1,4 @@
+import Link from "next/link";
+import { DemoLogin } from "@/components/demo-login";
+export const metadata={title:"تجربة تسجيل الدخول · ميسك"};
+export default function Page(){return <main className="auth-page"><aside className="auth-aside"><Link href="/demo-site" className="public-logo" style={{color:"white"}}>Mesk | ميسك</Link><div><h2>من الموقع.<br/>إلى إدارة المشروع.<br/>خطوة بخطوة.</h2><p>تجربة لشرح خطوات الدخول وتعبئة النماذج ببيانات افتراضية.</p></div><small>بيئة تدريب مستقلة عن حساب شركتك</small></aside><div className="auth-form-wrap"><div className="auth-form"><span className="public-eyebrow">عرض تدريبي</span><h1>تسجيل الدخول التجريبي</h1><p>أدخل بيانات افتراضية لاستعراض لوحة الإدارة. الدخول الفعلي يتم بحساب أنشأه مدير الشركة.</p><DemoLogin/><div className="auth-links"><Link href="/demo-site">العودة إلى الموقع التجريبي</Link></div></div></div></main>;}

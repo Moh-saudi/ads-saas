@@ -1,35 +1,42 @@
 import type { CSSProperties, ReactNode } from "react";
-import { Cairo, Tajawal, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import "./agency.css";
 import "./dashboard.css";
+import "./invoice.css";
 import { Pwa } from "@/components/pwa";
+import { shareMetadata, siteDescription } from "@/lib/share-metadata";
 
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+const cairo = localFont({
+  src: "./fonts/Cairo.ttf",
   variable: "--font-cairo",
   display: "swap",
 });
 
-const tajawal = Tajawal({
-  subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "700", "800"],
-  variable: "--font-tajawal",
+const tajawal = localFont({
+  src: [
+    { path: "./fonts/Tajawal-Regular.ttf", weight: "400" },
+    { path: "./fonts/Tajawal-Medium.ttf", weight: "500" },
+    { path: "./fonts/Tajawal-Bold.ttf", weight: "700" },
+    { path: "./fonts/Tajawal-ExtraBold.ttf", weight: "800" },
+  ],
+  variable: "--font-dashboard-arabic",
   display: "swap",
 });
 
-const dashboardNumbers = Inter({
-  subsets: ["latin"],
+const dashboardNumbers = localFont({
+  src: "./fonts/Inter.ttf",
+  weight: "100 900",
   variable: "--font-dashboard-numbers",
-  // Let Arabic glyphs fall through to Tajawal rather than Inter's Arial fallback.
+  // Arabic glyphs fall through to Tajawal instead of an Arial fallback.
   adjustFontFallback: false,
   display: "swap",
 });
 
 export const metadata = {
+  ...shareMetadata(),
   title: { default: "مِسك | إدارة المساحات الإعلانية", template: "%s | مِسك" },
-  description: "إدارة الأصول والعقود والمواقع الإعلانية من مكان واحد.",
+  description: siteDescription,
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg" },
   appleWebApp: { capable: true, title: "Mesk", statusBarStyle: "default" },
@@ -45,7 +52,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ar" dir="rtl">
       <body
-        className={`${cairo.variable} ${tajawal.variable} ${dashboardNumbers.variable}`}
+        className={`${cairo.variable} ${tajawal.className} ${tajawal.variable} ${dashboardNumbers.variable}`}
         style={{
           "--font-dashboard-latin": dashboardNumbers.style.fontFamily.split(",")[0],
           "--font-dashboard-arabic": tajawal.style.fontFamily.split(",")[0],

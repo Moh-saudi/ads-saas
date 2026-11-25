@@ -37,7 +37,7 @@ export default async function Page({
             <br />
             قرارات أفضل.
           </h2>
-          <p>مساحة عمل واحدة لإدارة الأصول والعقود والتحصيل.</p>
+          <p>مساحة عمل واحدة لإدارة اللوحات والعقود والتحصيل.</p>
         </div>
         <small>Powered by Mesk LLC</small>
       </aside>

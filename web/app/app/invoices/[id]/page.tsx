@@ -1,7 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { requireContext } from "@/lib/data";
 import { InvoiceDocument } from "@/components/invoice-document";
+
 export const dynamic = "force-dynamic";
+
 export default async function Page({
   params,
 }: {
@@ -33,7 +35,7 @@ export default async function Page({
         .order("id"),
       db
         .from("payments")
-        .select("amount,paid_on,reference")
+        .select("*")
         .eq("invoice_id", id)
         .eq("tenant_id", brand.id)
         .order("paid_on"),

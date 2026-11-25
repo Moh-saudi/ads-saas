@@ -1,4 +1,5 @@
 "use client";
+import { PaymentMethodField } from "./payment-method-field";
 import { useState, useEffect } from "react";
 import {
   Plus,
@@ -26,6 +27,7 @@ export function OperationForm({
     purchase = o.purchases.find((p) => p.id === m.id),
     leave = o.leaves.find((l) => l.id === m.id),
     lead = o.enquiries.find((l) => l.id === m.id);
+  const [purchaseAsset, setPurchaseAsset] = useState("");
   const [stockKind, setStockKind] = useState("receipt"),
     [cashKind, setCashKind] = useState("expense"),
     [chosenEmployee, setChosenEmployee] = useState(employee?.id || ""),
@@ -38,7 +40,7 @@ export function OperationForm({
       name: `${a.code} · ${a.street_name}`,
     })),
     warehouses = o.warehouses.map((w) => ({ id: w.id, name: w.name })),
-    items = o.items.map((i) => ({ id: i.id, name: `${i.sku} · ${i.name}` })),
+    items = o.items.map((i) => ({ id: i.id, name: `${i.sku} · ${i.name}${i.length_m && i.width_m ? ` · ${i.length_m}×${i.width_m} م` : ""}` })),
     cashAccounts = o.cashAccounts.map((c) => ({
       id: c.id,
       name: `${c.name} · ${egp(c.balance)}`,
@@ -393,6 +395,7 @@ export function OperationForm({
           <Field name="sku" label="كود الصنف SKU" />
           <Field name="name" label="اسم الصنف" />
           <Field name="unit" label="وحدة القياس" value="قطعة" />
+          <div className="form-grid"><Field name="length_m" label="الطول بالمتر (اختياري)" type="number" min="0.01" required={false} /><Field name="width_m" label="العرض بالمتر (اختياري)" type="number" min="0.01" required={false} /></div><Field name="material" label="الخامة / المواصفات" required={false} />
           <Field
             name="reorder_level"
             label="حد إعادة الطلب"
@@ -419,7 +422,7 @@ export function OperationForm({
               <option value="adjustment_out">عجز جرد</option>
             </select>
           </label>
-          <Field name="ref_no" label="مرجع الحركة" />
+          <Field name="ref_no" label="رقم الحركة" />
           <Pick name="item_id" label="الصنف" options={items} />
           {["issue", "transfer", "adjustment_out"].includes(stockKind) && (
             <Pick
@@ -451,7 +454,7 @@ export function OperationForm({
           {stockKind === "return" && (
             <Pick
               name="return_of"
-              label="الحركة المصروفة الأصلية"
+              label="إذن الصرف الأصلي"
               options={o.stockMoves
                 .filter((m) => m.kind === "issue")
                 .map((m) => ({
@@ -462,7 +465,7 @@ export function OperationForm({
           )}
           <Pick
             name="asset_id"
-            label="الأصل المرتبط"
+            label="اللوحة المرتبطة"
             options={assets}
             required={false}
           />
@@ -484,7 +487,11 @@ export function OperationForm({
       )}
       {kind === "purchase" && (
         <>
-          <Field name="ref_no" label="رقم أمر الشراء" />
+          <Field name="ref_no" label="رقم أمر التوريد" />
+          <Pick name="procurement_kind" label="نوع الطلب" value="purchase" options={[{id:"purchase",name:"شراء جاهز"},{id:"external_manufacture",name:"تصنيع لدى المورد"}]} />
+          <label>اللوحة المخصصة لها المعدات (اختياري)<select name="asset_id" value={purchaseAsset} onChange={e=>setPurchaseAsset(e.target.value)}><option value="">توريد عام للمخزن</option>{assets.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
+          <Pick key={purchaseAsset} name="work_order_id" label="أمر التركيب المرتبط (اختياري)" required={false} options={o.workOrders.filter(w=>w.asset_id===purchaseAsset && !["completed","cancelled"].includes(w.status)).map(w=>({id:w.id,name:`${w.ref_no} · ${w.title}`}))} />
+          <p className="subtle">التصنيع هنا لدى مورد خارجي. الاستلام يضيف للمخزن؛ تركيب المعدات على اللوحة يحتاج حركة صرف مرتبطة باللوحة وأمر التركيب.</p>
           <Pick
             name="supplier_id"
             label="المورد"
@@ -542,7 +549,9 @@ export function OperationForm({
         <>
           <Field name="ref_no" label="رقم أمر العمل" />
           <Field name="title" label="المهمة المطلوبة" />
-          <Pick name="asset_id" label="الأصل" options={assets} />
+          <Pick name="work_kind" label="نوع أمر العمل" value="installation" options={[{id:"installation",name:"تركيب"},{id:"removal",name:"فك الإعلان"},{id:"maintenance",name:"صيانة"}]} />
+          <Field name="planned_start" label="بداية التنفيذ المخططة" type="date" required={false} />
+          <Pick name="asset_id" label="اللوحة" options={assets} />
           <Pick
             name="assigned_employee_id"
             label="الموظف المسؤول"
@@ -597,25 +606,26 @@ export function OperationForm({
       )}
       {kind === "asset_tag" && (
         <>
-          <Pick name="asset_id" label="الأصل" options={assets} />
+          <Pick name="asset_id" label="اللوحة" options={assets} />
           <Pick
             name="tag_kind"
-            label="نوع الوسم"
+            label="نوع كود التعريف"
             options={[
               { id: "qr", name: "QR" },
               { id: "nfc", name: "NFC" },
               { id: "rfid", name: "RFID (تسجيل المعرف فقط)" },
             ]}
           />
-          <Field name="uid" label="معرف الوسم الفريد" />
+          <Field name="uid" label="رقم كود التعريف" />
           <p className="subtle">
-            لـNFC سجّل الرقم التسلسلي المقروء من الوسم. توليد QR متاح بعد حفظ
+            لـNFC سجّل الرقم التسلسلي المقروء من ملصق التعريف. توليد QR متاح بعد حفظ
             معرفه.
           </p>
         </>
       )}
       {kind === "cash" && (
         <>
+          <PaymentMethodField />
           <label>
             نوع الحركة
             <select
@@ -631,7 +641,7 @@ export function OperationForm({
               )}
             </select>
           </label>
-          <Field name="ref_no" label="مرجع السند" />
+          <Field name="ref_no" label="رقم السند" />
           <Pick
             name="cash_account_id"
             label={cashKind === "transfer" ? "التحويل من" : "الخزينة / البنك"}
@@ -663,7 +673,7 @@ export function OperationForm({
           <Field name="description" label="البيان" />
           <Pick
             name="asset_id"
-            label="الأصل (اختياري)"
+            label="اللوحة (اختياري)"
             options={assets}
             required={false}
           />
@@ -684,7 +694,7 @@ export function OperationForm({
       )}
       {kind === "adjustment" && (
         <>
-          <Field name="ref_no" label="مرجع قيد التسوية" />
+          <Field name="ref_no" label="رقم قيد التسوية" />
           <Field name="entry_date" label="تاريخ القيد" type="date" />
           <Note name="description" label="بيان وسبب التسوية" required />
           <AdjustmentLines data={d} />
@@ -868,14 +878,14 @@ function InspectionFields({
       }
     ).NDEFReader;
     if (!NFC) {
-      setMessage("Web NFC غير مدعوم هنا. استخدم QR أو أدخل معرف الوسم يدويًا.");
+      setMessage("Web NFC غير مدعوم هنا. استخدم QR أو أدخل رقم كود التعريف يدويًا.");
       return;
     }
     try {
       const reader = new NFC();
       await reader.scan();
       setMethod("nfc");
-      setMessage("قرّب الهاتف من الوسم.");
+      setMessage("قرّب الهاتف من ملصق التعريف.");
       reader.addEventListener("reading", (e) => {
         setTag(e.serialNumber);
         setMessage("تمت قراءة المعرف. أكمل بيانات الزيارة ثم احفظ.");
@@ -891,7 +901,7 @@ function InspectionFields({
     <>
       <Pick
         name="asset_id"
-        label="الأصل"
+        label="اللوحة"
         value={initialAsset}
         options={d.assets.map((a) => ({
           id: a.id,
@@ -922,7 +932,7 @@ function InspectionFields({
       </label>
       {method !== "manual" && (
         <label>
-          معرف الوسم
+          رقم كود التعريف
           <input
             name="tag_uid"
             required
@@ -997,7 +1007,7 @@ function QrPreview({ data: d, id }: { data: WorkspaceData; id: string }) {
   }, [t, d.demo]);
   return (
     <div className="qr-preview">
-      {src && <img src={src} alt={`رمز QR للأصل ${asset?.code}`} />}
+      {src && <img src={src} alt={`رمز QR للوحة ${asset?.code}`} />}
       <h3>{asset?.code}</h3>
       <p>{asset?.street_name}</p>
       <code>{t?.uid}</code>

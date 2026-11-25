@@ -1,0 +1,25 @@
+{
+  "fontRequests": 0,
+  "results": [
+    {
+      "route": "/demo/dashboard",
+      "width": 1440,
+      "passed": "dashboard renders, no overflow, Latin digits preserved"
+    },
+    {
+      "route": "/demo-site",
+      "width": 1440,
+      "passed": "offline demo renders, no overflow, tenant color applied, slider navigation"
+    },
+    {
+      "route": "/demo/dashboard",
+      "width": 390,
+      "passed": "dashboard renders, no overflow, Latin digits preserved"
+    },
+    {
+      "route": "/demo-site",
+      "width": 390,
+      "passed": "offline demo renders, no overflow, tenant color applied, slider navigation, mobile menu works"
+    }
+  ]
+}

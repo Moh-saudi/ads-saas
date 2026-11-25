@@ -3,10 +3,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireContext } from "@/lib/data";
+import { coordinateGeometry } from "@/lib/coordinates.mjs";
+import { prepareAssetPhoto, storeAssetPhoto } from "@/lib/asset-photo-storage";
 import { configured } from "@/lib/env";
 import { operationModules, operationMutation } from "@/lib/operation-actions";
 
-export type ActionState = { ok: boolean; message: string };
+export type ActionState = { ok: boolean; message: string; id?: string };
 export async function login(
   _: ActionState,
   form: FormData,
@@ -44,16 +46,27 @@ export async function logout() {
 
 function friendly(message: string, code?: string) {
   const messages: Record<string, string> = {
+    INVALID_LINES: "اختر لوحة واحدة على الأقل وأدخل سعرًا صحيحًا لكل بند.",
+    INVALID_PERIOD: "راجع تاريخ البداية والنهاية؛ النهاية لا تسبق البداية.",
+    INVALID_PRICE: "أدخل سعرًا شهريًا صحيحًا لا يقل عن صفر.",
+    INVALID_PROCUREMENT_WORK: "أمر العمل يجب أن يكون مفتوحًا ومرتبطًا بنفس اللوحة المختارة.",
+    INVALID_PROCUREMENT_KIND: "اختر الشراء أو التصنيع لدى المورد.",
+    LICENSE_PERIOD_CONFLICT: "مدة الإعلان غير مغطاة بتصريح ساري لكل لوحة. أضف التصريح أو جدّده قبل الحفظ؛ استثناء حق الاستغلال لا يتجاوز التصريح.",
+    LICENSE_HAS_ACTIVE_BOOKINGS: "لا يمكن تقصير أو إلغاء تصريح تعتمد عليه حجوزات قائمة. أضف تصريح التجديد أولًا أو عدّل الحجوزات.",
+    INVALID_LICENSE_PERIOD: "أدخل بداية ونهاية صحيحتين لصلاحية التصريح.",
+    INVALID_LICENSE: "اختر اللوحات وأدخل رقم التصريح وجهة الإصدار.",
     INVALID_WEBSITE_URL: "استخدم رابط HTTPS صحيحًا للصورة أو الموقع أو الخريطة.",
     INVALID_WEBSITE_CONTENT: "راجع العناوين وبيانات أقسام الموقع والحد الأقصى لعدد العناصر.",
+    PAYMENT_METHOD_REQUIRED: "اختر طريقة التحصيل أو الدفع قبل الحفظ.",
+    INVALID_COORDINATES: "اختر نقطة صحيحة على الخريطة قبل الحفظ.",
     ASSET_HAS_ACTIVE_LEASES:
-      "لا يمكن استبعاد الأصل قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
-    ASSET_RETIRED: "هذا الأصل مستبعد. أعد تفعيله من بطاقة الأصل قبل حجزه.",
-    ASSET_OUT_OF_SCOPE: "الأصل غير نشط أو يقع خارج نطاق صلاحيتك. راجع حالته وتغطية منطقتك.",
+      "لا يمكن استبعاد اللوحة قبل انتهاء أو إلغاء حجوزاته الحالية والمستقبلية.",
+    ASSET_RETIRED: "هذه اللوحة مستبعدة. أعد تفعيلها من بطاقة اللوحة قبل حجزها.",
+    ASSET_OUT_OF_SCOPE: "اللوحة غير نشطة أو تقع خارج المنطقة المسموح لك بإدارتها. راجع حالتها وصلاحياتك.",
     CONTROL_ACCOUNT_REQUIRES_WORKFLOW:
       "هذا الحساب مرتبط بسجل تشغيلي؛ استخدم سند النقدية أو المخزون أو الفوترة المرتبطة به.",
     UPSTREAM_PARTY_REQUIRED:
-      "اختر الجهة المالكة أو صاحب حق الاستغلال للعقد الصاعد.",
+      "اختر الجهة المالكة أو صاحب حق الاستغلال لعقد استغلال المواقع.",
     INSUFFICIENT_STOCK: "الرصيد المتاح في المخزن لا يكفي لهذه الحركة.",
     INSUFFICIENT_CASH: "رصيد الخزينة أو البنك لا يكفي للصرف في هذا التاريخ.",
     INVALID_STOCK_RETURN:
@@ -67,17 +80,24 @@ function friendly(message: string, code?: string) {
     ATTENDANCE_ALREADY_OPEN:
       "يوجد حضور مفتوح لهذا الموظف. سجّل الانصراف أولًا.",
     NO_OPEN_ATTENDANCE: "لا يوجد تسجيل حضور مفتوح.",
-    INVALID_ASSET_TAG: "الوسم لا يطابق الأصل المحدد.",
+    INVALID_ASSET_TAG: "كود التعريف لا يطابق اللوحة المحددة.",
     FUTURE_ATTENDANCE: "لا يمكن تسجيل حضور أو انصراف في المستقبل.",
     REASON_REQUIRED: "أدخل سببًا واضحًا لتوثيق الإجراء.",
     UNBALANCED_JOURNAL: "القيد غير متوازن. لم تُحفظ الحركة.",
   };
+  if (["PGRST204","PGRST205"].includes(code || "")) return "يلزم تطبيق ملف تحديث دورة العمل الأخير على سوبابيز قبل استخدام هذه الإضافة.";
+  if (code === "PGRST202" && /create_asset_purchase|progress_asset_work/.test(message)) return "يلزم تطبيق تحديث ربط تجهيز اللوحات على سوبابيز أولًا.";
+  if (code === "PGRST202" && /register_asset_licenses/.test(message)) return "يلزم تطبيق تحديث صلاحية التراخيص على سوبابيز أولًا.";
+  if (code === "PGRST202" && /record_invoice_payment_with_method|create_cash_transaction_with_method/.test(message)) return "يلزم تفعيل تحديث طرق التحصيل على قاعدة البيانات أولًا. تواصل مع مدير النظام ثم أعد المحاولة.";
   const known = Object.keys(messages).find((key) => message.includes(key));
   if (known) return messages[known];
   if (message.includes("CHAIN_CONFLICT"))
-    return "CHAIN_CONFLICT — فترة الإيجار تتجاوز تغطية العقد الصاعد. قصّر المدة أو جدّد التغطية قبل الحفظ.";
+    return "مدة إعلان العميل تتجاوز مدة استغلال الموقع المتاحة. عدّل المدة أو جدّد عقد استغلال الموقع قبل الحفظ.";
+  if (code === "23P01" && message.includes("pricing_rules"))
+    return "توجد أسعار مسجلة لنفس المنطقة والنوع خلال هذه الفترة. اختر فترة غير متداخلة.";
   if (code === "23P01")
     return "العنصر محجوز خلال هذه الفترة. اختر فترة أو عنصرًا آخر.";
+  if (message.includes("electronic_payment_reference")) return "أدخل مرجع التحويل البنكي أو إنستا باي أو المحفظة أو البطاقة قبل تسجيل التحصيل.";
   if (code === "23505") return "الرقم أو الكود مستخدم بالفعل داخل الشركة.";
   if (code === "42501" || message.includes("FORBIDDEN"))
     return "لا تملك صلاحية إجراء هذا التغيير أو يقع العنصر خارج نطاقك.";
@@ -101,6 +121,7 @@ export async function mutate(
     asset: "assets",
     party: "customers",
     contract: "customer_contracts",
+    pricing_rule: "customer_contracts",
     invoice: "finance",
     payment: "finance",
     license: "licenses",
@@ -120,7 +141,7 @@ export async function mutate(
     if (!data?.enabled)
       return { ok: false, message: "هذه الوحدة غير مفعّلة للشركة." };
   }
-  let result: { error: { message: string; code?: string } | null };
+  let result: { data?: { id: string } | null; error: { message: string; code?: string } | null };
   try {
     if (operationModules[kind]) {
       result = await operationMutation(kind, form, context);
@@ -151,21 +172,10 @@ export async function mutate(
         });
         break;
       case "asset": {
-        const lat = str("latitude"),
-          lng = str("longitude");
-        if (
-          (lat && !lng) ||
-          (!lat && lng) ||
-          (lat &&
-            (!Number.isFinite(Number(lat)) || Math.abs(Number(lat)) > 90)) ||
-          (lng &&
-            (!Number.isFinite(Number(lng)) || Math.abs(Number(lng)) > 180))
-        )
-          return {
-            ok: false,
-            message: "أدخل إحداثيات صحيحة: خط العرض وخط الطول معًا.",
-          };
-        result = await db.from("assets").insert({
+        const geometry = coordinateGeometry(str("latitude"), str("longitude"));
+        if (!geometry) return { ok: false, message: "اختر موقعًا صحيحًا على الخريطة قبل حفظ اللوحة." };
+        const photo = await prepareAssetPhoto(form.get("asset_photo"));
+        const created = await db.from("assets").insert({
           tenant_id: brand.id,
           code: str("code"),
           street_id: str("street_id"),
@@ -174,23 +184,36 @@ export async function mutate(
           width_m: num("width_m") || null,
           faces: num("faces") || 1,
           material: str("material"),
-          geom: lat ? `SRID=4326;POINT(${Number(lng)} ${Number(lat)})` : null,
+          geom: geometry,
           public_visible: form.get("public_visible") === "on",
           cost: str("cost") ? num("cost") : null,
           install_date: str("install_date") || null,
           useful_life_months: str("useful_life_months")
             ? num("useful_life_months")
             : null,
-        });
+        }).select("id").single();
+        result = created;
+        if (!created.error && created.data && photo) {
+          let failed = false;
+          try { const upload = await storeAssetPhoto(db, brand.id, created.data.id, photo); failed = Boolean(upload.error); }
+          catch { failed = true; }
+          if (failed) {
+            revalidatePath("/", "layout");
+            return { ok: true, message: "تم إنشاء اللوحة وحفظ موقعه، لكن تعذر رفع الصورة. افتح بطاقة اللوحة وأعد رفع الصورة؛ لا تنشئ اللوحة مرة أخرى." };
+          }
+        }
         break;
       }
+      case "pricing_rule":
+        result = await db.from("pricing_rules").insert({tenant_id:brand.id,district_id:str("district_id"),type_id:str("type_id"),monthly_price:num("monthly_price"),valid_from:str("valid_from"),valid_to:str("valid_to")});
+        break;
       case "contract":
         result = await db.rpc("create_customer_contract", {
           p_customer_id: str("customer_id"),
           p_ref_no: str("ref_no"),
           p_start: str("start_date"),
           p_end: str("end_date"),
-          p_lines: form.getAll("asset_id").map((id) => ({
+          p_lines: str("contract_lines") ? JSON.parse(str("contract_lines")) : form.getAll("asset_id").map((id) => ({
             asset_id: String(id),
             monthly_price: num("monthly_price"),
           })),
@@ -210,34 +233,33 @@ export async function mutate(
         });
         break;
       case "payment":
-        result = await db.rpc("record_invoice_payment", {
+        result = await db.rpc("record_invoice_payment_with_method", {
           p_invoice_id: str("invoice_id"),
           p_amount: num("amount"),
           p_paid_on: str("paid_on"),
           p_reference: str("reference"),
           p_cash_account_id: str("cash_account_id"),
+          p_payment_method: str("payment_method"),
         });
         break;
       case "license":
-        result = await db.from("licenses").insert({
-          tenant_id: brand.id,
-          asset_id: str("asset_id"),
-          ref_no: str("ref_no"),
-          issuer: str("issuer"),
-          expires_on: str("expires_on"),
+        result = await db.rpc("register_asset_licenses", {
+          p_assets: form.getAll("asset_id").map(String),
+          p_ref: str("ref_no"), p_issuer: str("issuer"),
+          p_start: str("valid_from"), p_end: str("expires_on"),
         });
         break;
       case "governorate":
         result = await db
           .from("governorates")
-          .insert({ tenant_id: brand.id, name: str("name") });
+          .insert({ tenant_id: brand.id, name: str("name") }).select("id").single();
         break;
       case "district":
         result = await db.from("districts").insert({
           tenant_id: brand.id,
           name: str("name"),
           governorate_id: str("governorate_id"),
-        });
+        }).select("id").single();
         break;
       case "street":
         result = await db.from("streets").insert({
@@ -245,7 +267,7 @@ export async function mutate(
           name: str("name"),
           district_id: str("district_id"),
           holding: str("holding"),
-        });
+        }).select("id").single();
         break;
       case "asset_type":
         result = await db.from("asset_types").insert({
@@ -372,5 +394,5 @@ export async function mutate(
       message: friendly(result.error.message, result.error.code),
     };
   revalidatePath("/", "layout");
-  return { ok: true, message: "تم الحفظ بنجاح." };
+  return { ok: true, message: "تم الحفظ بنجاح.", ...(result.data?.id ? { id: result.data.id } : {}) };
 }

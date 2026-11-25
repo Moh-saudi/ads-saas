@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import {
+  Suspense,
   useMemo,
   useState,
   useCallback,
@@ -24,7 +25,6 @@ import {
   Search,
   ChevronLeft,
   Menu,
-  X,
   LogOut,
   Bell,
   Building2,
@@ -40,8 +40,23 @@ import {
   Globe,
   ExternalLink,
 } from "lucide-react";
+import { FormDialog as Modal } from "./form-dialog";
+import { CompanySetup } from "./company-setup";
+import { CustomerStatement } from "./customer-statement";
+import { BookingCalendar } from "./booking-calendar";
+import { ContractBookingFields } from "./contract-booking-fields";
+import { PricingPanel } from "./pricing-profitability";
+import { LicenseCompliance } from "./license-compliance";
+import { cairoDay } from "@/lib/license-periods.mjs";
+import { LocationHierarchy } from "./location-hierarchy";
+import { GuidedTour } from "./guided-tour";
+import { WorkflowGuide } from "./workflow-guide";
+import { LocationCoverage } from "./location-coverage";
+import { PaymentMethodField } from "./payment-method-field";
 import { DataForm } from "./forms";
+import type { MapPoint } from "./location-picker";
 import { Operations, operationNavigation } from "./operations";
+import { CollectionChart } from "./collection-chart";
 import { Analytics } from "./analytics";
 import { ContractOperations } from "./contract-operations";
 import { ItemizedInvoiceFields } from "./invoice-fields";
@@ -59,6 +74,10 @@ const AssetMap = dynamic(() => import("./map").then((m) => m.AssetMap), {
   ssr: false,
   loading: () => <div className="asset-map skeleton">جارٍ تحميل الخريطة…</div>,
 });
+const LocationPicker = dynamic(() => import("./location-picker").then((m) => m.LocationPicker), {
+  ssr: false,
+  loading: () => <p className="notice">جارٍ تحميل خريطة اختيار الموقع…</p>,
+});
 const number = (n: number | null | undefined) =>
   new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(
     Number(n || 0),
@@ -75,6 +94,7 @@ const formatDate = (v: string | null) =>
       }).format(new Date(`${v}T12:00:00Z`))
     : "—";
 const navigation = [
+  { id: "guide", label: "دليل الاستخدام", icon: FileText, module: "guide" },
   {
     id: "dashboard",
     label: "نظرة عامة",
@@ -83,7 +103,7 @@ const navigation = [
   },
   {
     id: "assets",
-    label: "الأصول والمواقع",
+    label: "اللوحات والمواقع",
     icon: PanelsTopLeft,
     module: "assets",
   },
@@ -95,13 +115,13 @@ const navigation = [
   },
   {
     id: "upstream",
-    label: "العقود الصاعدة",
+    label: "عقود استغلال المواقع",
     icon: Layers,
     module: "upstream_contracts",
   },
   {
     id: "customers",
-    label: "العملاء والأطراف",
+    label: "العملاء والموردون والجهات",
     icon: Users,
     module: "customers",
   },
@@ -113,20 +133,20 @@ const navigation = [
   },
   {
     id: "finance",
-    label: "الفواتير والتحصيل",
+    label: "الفواتير والتحصيلات",
     icon: Wallet,
     module: "finance",
   },
-  { id: "licenses", label: "التراخيص", icon: ShieldCheck, module: "licenses" },
+  { id: "licenses", label: "التراخيص والتصاريح", icon: ShieldCheck, module: "licenses" },
   {
     id: "conflicts",
-    label: "التعارضات والتنبيهات",
+    label: "التنبيهات ومشكلات الحجز",
     icon: TriangleAlert,
     module: "dashboard",
   },
   {
     id: "settings",
-    label: "هوية الشركة والإعدادات",
+    label: "إعدادات الشركة",
     icon: Settings,
     module: "settings",
   },
@@ -146,10 +166,11 @@ export function Workspace({
     [search, setSearch] = useState(""),
     [status, setStatus] = useState("all"),
     [mapView, setMapView] = useState(false);
+  const [geographyFilter, setGeographyFilter] = useState({ governorate: "", district: "", street: "" });
   const base = d.demo ? "/demo" : "/app";
   const nav = navigation.find((n) => n.id === section) || navigation[0];
   const enabled = (key: string) =>
-    key === "settings" ||
+    key === "guide" || key === "settings" ||
     d.modules.some((m) => m.module_key === key && m.enabled);
   const visibleNav = navigation.filter(
     (n) =>
@@ -220,7 +241,7 @@ export function Workspace({
     URL.revokeObjectURL(url);
   }
   return (
-    <div className="workspace">
+    <div className={`workspace${d.demo ? " demo-workspace" : ""}`}>
       {menu && (
         <button
           className="sidebar-backdrop"
@@ -239,7 +260,7 @@ export function Workspace({
           </div>
           <div>
             <strong>{d.brand.name}</strong>
-            <small>إدارة المساحات الإعلانية</small>
+            <small>{d.demo ? "الشركة المطوّرة · ديمو" : "إدارة المساحات الإعلانية"}</small>
           </div>
         </Link>
         <div className="workspace-label">
@@ -381,8 +402,8 @@ export function Workspace({
                   تصدير
                 </button>
               )}
-              {canCreate && (
-                <button
+              {canCreate && section !== "geography" && (
+                <button data-tour-create
                   className="button primary"
                   onClick={() =>
                     setModal(
@@ -406,7 +427,7 @@ export function Workspace({
                   {section === "contracts"
                     ? "عقد جديد"
                     : section === "assets"
-                      ? "إضافة أصل"
+                      ? "إضافة لوحة"
                       : section === "customers"
                         ? "إضافة طرف"
                         : section === "finance"
@@ -414,18 +435,20 @@ export function Workspace({
                           : section === "licenses"
                             ? "إضافة ترخيص"
                             : section === "upstream"
-                              ? "عقد صاعد جديد"
+                              ? "عقد استغلال جديد"
                               : "إضافة شارع"}
                 </button>
               )}
             </div>
           </div>
+          <Suspense fallback={null}><GuidedTour section={section} demo={d.demo} canOpen={!!canCreate && enabled(nav.module)} onOpen={setModal} /></Suspense>
           {!enabled(nav.module) ? (
             <Empty text="هذه الوحدة غير مفعّلة. يمكن لمدير الشركة تفعيلها من الإعدادات." />
           ) : section === "settings" && d.profile.role !== "admin" ? (
             <Empty text="هذه الشاشة مخصصة لمدير النظام." />
           ) : (
             <>
+              {section === "guide" && <><CompanySetup data={d} /><WorkflowGuide demo={d.demo} /></>}
               {(operationSections as readonly string[]).includes(section) && (
                 <Operations key={section} data={d} section={section} />
               )}
@@ -433,43 +456,44 @@ export function Workspace({
                 <>
                   <div className="kpi-grid">
                     <Kpi
-                      title="إجمالي الأصول"
+                      title="إجمالي اللوحات"
                       value={number(d.kpis.total_assets)}
                       icon={<PanelsTopLeft size={21} />}
-                      footer={`${number(d.kpis.leased)} أصلًا مؤجرًا`}
+                      footer={`${number(d.kpis.leased)} لوحة مؤجرة`}
                       tone="navy"
                     />
                     <Kpi
                       title="نسبة الإشغال"
                       value={`${number(d.kpis.occupancy_pct)}%`}
                       icon={<LayoutGrid size={21} />}
-                      footer={`${number(Number(d.kpis.total_assets) - Number(d.kpis.leased))} أصل غير مؤجر`}
+                      footer={`${number(Number(d.kpis.total_assets) - Number(d.kpis.leased))} لوحة غير مؤجرة`}
                       tone="green"
                     />
                     <Kpi
-                      title="الإيراد الشهري التعاقدي"
+                      title="قيمة الإعلانات الشهرية"
                       value={money(d.kpis.monthly_revenue)}
                       icon={<Wallet size={21} />}
                       footer="قيمة الإيجارات السارية حاليًا"
                       tone="gold"
                     />
                     <Kpi
-                      title="صافي الهامش الشهري"
+                      title="هامش استغلال اللوحات"
                       value={money(d.kpis.net_margin)}
                       icon={<ArrowUpRight size={21} />}
                       footer={`التكلفة ${money(d.kpis.monthly_cost)}`}
                       tone="green"
                     />
                   </div>
+                  <LocationCoverage assets={d.assets} />
                   <Analytics data={d} />
                   <div className="dashboard-middle">
                     <section className="card map-card">
                       <CardHead
                         title="مواقعك على الخريطة"
-                        sub="توزيع الأصول وحالة الإشغال"
+                        sub="توزيع اللوحات وحالة الإشغال"
                         action={
                           <Link href={`${base}/assets`}>
-                            عرض الأصول <ChevronLeft size={15} />
+                            عرض اللوحات <ChevronLeft size={15} />
                           </Link>
                         }
                       />
@@ -495,8 +519,8 @@ export function Workspace({
                     </section>
                     <section className="card occupancy-card">
                       <CardHead
-                        title="حالة المحفظة"
-                        sub="الإشغال الحالي للأصول"
+                        title="حالة اللوحات"
+                        sub="الإشغال الحالي للوحات"
                       />
                       <div
                         className="donut"
@@ -598,11 +622,11 @@ export function Workspace({
                           <strong>
                             {conflicts.length
                               ? `${number(conflicts.length)} تعارضات في التغطية`
-                              : "سلسلة التعاقد سليمة"}
+                              : "مدد العقود متوافقة"}
                           </strong>
                           <small>
                             {conflicts.length
-                              ? "تحتاج مراجعة العقود الصاعدة"
+                              ? "تحتاج مراجعة عقود استغلال المواقع"
                               : "لا توجد تعارضات حالية مرصودة"}
                           </small>
                         </span>
@@ -611,27 +635,28 @@ export function Workspace({
                       <div className="chain-mini">
                         <span>الجهة المالكة</span>
                         <ChevronLeft size={13} />
-                        <span>الوطنية</span>
+                        <span>صاحب الامتياز</span>
                         <ChevronLeft size={13} />
                         <b>شركتك</b>
                         <ChevronLeft size={13} />
                         <span>المعلن</span>
                       </div>
                       <p className="subtle">
-                        لا تُقبل مدة إيجار تتجاوز التغطية الصاعدة إلا باستثناء
+                        لا تُقبل مدة إيجار تتجاوز فترة استغلال الموقع إلا باستثناء
                         معتمد ومسجل.
                       </p>
                     </section>
                   </div>
                 </>
               )}
+              {section === "assets" && <LocationCoverage assets={d.assets} />}
               {section === "assets" && (
                 <section className="card">
                   <div className="toolbar">
                     <div className="search-box">
                       <Search size={18} />
                       <input
-                        aria-label="البحث في الأصول"
+                        aria-label="البحث في اللوحات"
                         placeholder="ابحث بالكود أو الشارع أو المنطقة…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -669,7 +694,7 @@ export function Workspace({
                     </div>
                   </div>
                   <div className="results-label">
-                    {number(filtered.length)} أصل · اضغط على الأصل لعرض تفاصيله
+                    {number(filtered.length)} لوحة · اضغط على اللوحة لعرض تفاصيله
                   </div>
                   {mapView ? (
                     <AssetMap assets={filtered} onSelect={selectAsset} />
@@ -682,7 +707,7 @@ export function Workspace({
                 <section className="card">
                   <CardHead
                     title="سجل عقود المعلنين"
-                    sub="الحجز محمي من تداخل الفترات وتجاوز التغطية"
+                    sub="منع حجز اللوحة مرتين في نفس الفترة أو بعد انتهاء حق استغلالها"
                   />
                   <Table
                     headings={[
@@ -716,7 +741,7 @@ export function Workspace({
                   </p>
                 </section>
               )}
-              {section === "contracts" && <ContractOperations data={d} />}
+              {section === "contracts" && <><BookingCalendar data={d} /><PricingPanel data={d} /><ContractOperations data={d} /></>}
               {section === "upstream" && (
                 <ContractOperations data={d} upstream />
               )}
@@ -762,7 +787,7 @@ export function Workspace({
               {section === "customers" && (
                 <section className="card">
                   <CardHead
-                    title="دليل العملاء والأطراف"
+                    title="دليل العملاء والموردون والجهات"
                     sub="المعلنون، الجهات المالكة، الشركات والموردون"
                   />
                   <Table
@@ -785,7 +810,7 @@ export function Workspace({
                               advertiser: "معلن",
                               agency: "وكالة",
                               authority: "جهة مالكة",
-                              master_concessionaire: "الشركة الوطنية",
+                              master_concessionaire: "صاحب الامتياز",
                               supplier: "مورد",
                             }[p.type]
                           }
@@ -800,49 +825,27 @@ export function Workspace({
               )}
               {section === "geography" && (
                 <>
-                  <div className="inline-actions">
-                    {canCreate && (
-                      <>
-                        <button
-                          className="button secondary"
-                          onClick={() => setModal("governorate")}
-                        >
-                          <Plus size={16} />
-                          محافظة
-                        </button>
-                        <button
-                          className="button secondary"
-                          onClick={() => setModal("district")}
-                        >
-                          <Plus size={16} />
-                          منطقة / حي
-                        </button>
-                        <button
-                          className="button secondary"
-                          onClick={() => setModal("asset_type")}
-                        >
-                          <Plus size={16} />
-                          نوع أصل
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  <section className="card"><LocationHierarchy d={d} required={false} onHierarchyChange={setGeographyFilter} />
+                    {canCreate && <button className="button secondary" onClick={() => setModal("asset_type")}>إضافة نوع لوحة</button>}
+                    <p>لإضافة لوحة: افتح «اللوحات والمواقع» ثم «إضافة لوحة». ستختار العنوان بنفس التسلسل وتحدد النقطة على الخريطة، ويمكنك إضافة العنوان الناقص دون مغادرة النموذج.</p>
+                    {canAssets && enabled("assets") && <button className="button primary" onClick={() => setModal("asset")}>إضافة لوحة{geographyFilter.street ? " في الشارع المحدد" : " وتحديد موقعها على الخريطة"}</button>}
+                    <Link className="button secondary" href={`${base}/assets`}>عرض كل اللوحات والمواقع</Link>
+                  </section>
                   <section className="card">
                     <Table
                       headings={[
                         "الشارع",
-                        "المنطقة",
-                        "نطاق الاستغلال",
-                        "عدد الأصول",
+                        "المحافظة / المنطقة",
+                        "نطاق التعاقد",
+                        "عدد اللوحات",
                       ]}
                     >
-                      {d.streets.map((s) => (
+                      {d.streets.filter(s => (!geographyFilter.street || s.id === geographyFilter.street) && (!geographyFilter.district || s.district_id === geographyFilter.district) && (!geographyFilter.governorate || d.districts.some(x => x.id === s.district_id && x.governorate_id === geographyFilter.governorate))).map((s) => (
                         <tr key={s.id}>
                           <td>{s.name}</td>
                           <td>
                             {
-                              d.districts.find((x) => x.id === s.district_id)
-                                ?.name
+                              (() => { const district = d.districts.find((x) => x.id === s.district_id); return `${d.governorates.find(g => g.id === district?.governorate_id)?.name ?? "—"} / ${district?.name ?? "—"}`; })()
                             }
                           </td>
                           <td>
@@ -864,6 +867,7 @@ export function Workspace({
               )}
               {section === "finance" && (
                 <>
+                  {canFinance && <><CollectionChart rows={d.operations.cashTransactions} /><CustomerStatement data={d} /></>}
                   <div className="kpi-grid three">
                     <Kpi
                       title="مطلوب تحصيله"
@@ -890,7 +894,7 @@ export function Workspace({
                           ),
                       )}
                       icon={<Building2 size={21} />}
-                      footer="الوطنية وباقي الأطراف"
+                      footer="الجهات والموردون"
                       tone="gold"
                     />
                     <Kpi
@@ -964,13 +968,15 @@ export function Workspace({
                 </>
               )}
               {section === "licenses" && (
-                <section className="card">
+                <><LicenseCompliance data={d} /><section className="card">
                   <Table
                     headings={[
                       "رقم الترخيص",
-                      "الأصل",
+                      "اللوحة",
                       "جهة الإصدار",
+                      "بداية الصلاحية",
                       "انتهاء الصلاحية",
+                      "حالة التصريح",
                     ]}
                   >
                     {d.licenses.map((l) => (
@@ -981,11 +987,13 @@ export function Workspace({
                             "—"}
                         </td>
                         <td>{l.issuer}</td>
+                        <td>{l.valid_from ? formatDate(l.valid_from) : "لم تُسجل — سجل قديم"}</td>
                         <td>{formatDate(l.expires_on)}</td>
+                        <td>{l.status === "revoked" ? "ملغي" : l.expires_on < cairoDay() ? "منتهي" : l.valid_from && l.valid_from > cairoDay() ? "لم يبدأ" : "ساري"}</td>
                       </tr>
                     ))}
                   </Table>
-                </section>
+                </section></>
               )}
               {section === "conflicts" && (
                 <>
@@ -997,7 +1005,7 @@ export function Workspace({
                   <section className="card">
                     <CardHead
                       title={`تعارضات التغطية الحالية (${number(conflicts.length)})`}
-                      sub="راجع العقد الصاعد أو مدة عقد المعلن"
+                      sub="راجع عقد استغلال المواقع أو مدة عقد المعلن"
                     />
                     {conflicts.length ? (
                       <AssetTable assets={conflicts} onSelect={selectAsset} />
@@ -1005,7 +1013,7 @@ export function Workspace({
                       <div className="all-clear">
                         <ShieldCheck size={40} />
                         <h3>لا توجد تعارضات حالية</h3>
-                        <p>الأصول المؤجرة الحالية ضمن تغطيتها التعاقدية.</p>
+                        <p>اللوحات المؤجرة الحالية ضمن تغطيتها التعاقدية.</p>
                       </div>
                     )}
                   </section>
@@ -1173,26 +1181,26 @@ export function Workspace({
               : (
                   {
                     party: "إضافة عميل أو طرف",
-                    asset: "إضافة أصل إعلاني",
+                    asset: "إضافة لوحة إعلانية",
                     contract: "إنشاء عقد معلن",
                     street: "إضافة شارع",
                     district: "إضافة منطقة",
                     governorate: "إضافة محافظة",
-                    asset_type: "إضافة نوع أصل",
+                    asset_type: "إضافة نوع لوحة",
                     invoice: "إنشاء فاتورة",
                     license: "إضافة ترخيص",
-                    upstream: "إنشاء عقد صاعد",
+                    upstream: "إنشاء عقد استغلال مواقع",
                   } as Record<string, string>
                 )[modal] || "إضافة سجل"
           }
           onClose={() => setModal(null)}
         >
-          <CreateForm kind={modal} d={d} />
+          <CreateForm kind={modal} d={d} initialStreet={section === "geography" ? geographyFilter.street : ""} />
         </Modal>
       )}
       {selected && (
         <Modal
-          title={`بطاقة الأصل · ${selected.code}`}
+          title={`بطاقة اللوحة · ${selected.code}`}
           onClose={() => setSelected(null)}
         >
           <AssetRecord
@@ -1296,7 +1304,7 @@ function AssetTable({
 }) {
   return (
     <Table
-      headings={["الأصل / الموقع", "نوع الأصل", "الحالة", "نهاية الإيجار", ""]}
+      headings={["اللوحة / الموقع", "نوع اللوحة", "الحالة", "نهاية الإيجار", ""]}
     >
       {assets.map((a) => (
         <tr key={a.id} onClick={() => onSelect(a)} className="clickable">
@@ -1317,70 +1325,6 @@ function AssetTable({
         </tr>
       ))}
     </Table>
-  );
-}
-function Modal({
-  title,
-  children,
-  onClose,
-}: {
-  title: string;
-  children: ReactNode;
-  onClose: () => void;
-}) {
-  const ref = useRef<HTMLElement>(null),
-    close = useRef(onClose);
-  close.current = onClose;
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close.current();
-      if (e.key === "Tab") {
-        const nodes = Array.from(
-          ref.current?.querySelectorAll<HTMLElement>(
-            "button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled)",
-          ) || [],
-        ).filter((node) => node.getClientRects().length > 0 && node.getAttribute("type") !== "hidden");
-        const first = nodes[0],
-          last = nodes[nodes.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => {
-      document.body.style.overflow = overflow;
-      document.removeEventListener("keydown", handler);
-      previous?.focus();
-    };
-  }, []);
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <section
-        ref={ref}
-        className="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-head">
-          <h2>{title}</h2>
-          <button className="icon-button" onClick={onClose} aria-label="إغلاق">
-            <X size={21} />
-          </button>
-        </div>
-        {children}
-      </section>
-    </div>
   );
 }
 function Field({
@@ -1450,11 +1394,15 @@ function Select({
         ))}
       </select>
       {!rows.length && <small>أضف السجلات المطلوبة أولًا.</small>}
-      {multiple && <small>يمكن اختيار أكثر من أصل باستخدام Ctrl أو ⌘.</small>}
+      {multiple && <small>يمكن اختيار أكثر من لوحة باستخدام Ctrl أو ⌘.</small>}
     </label>
   );
 }
-function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
+function CreateForm({ kind, d, initialStreet = "" }: { kind: string; d: WorkspaceData; initialStreet?: string }) {
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [assetPoint, setAssetPoint] = useState<MapPoint | null>(null);
+  const clearAssetPoint = useCallback(() => setAssetPoint(null), []);
+  const assetCenter = d.assets.find((asset) => asset.latitude != null && asset.longitude != null);
   const actual = kind.startsWith("payment:") ? "payment" : kind;
   const invoice = d.finance.find((f) => f.id === kind.split(":")[1]);
   return (
@@ -1462,6 +1410,8 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       key={kind}
       kind={actual}
       demo={d.demo}
+      disabled={actual === "asset" && !assetPoint}
+      onSuccess={actual === "asset" ? clearAssetPoint : undefined}
       label={actual === "contract" ? "فحص التوفر وإنشاء العقد" : "حفظ البيانات"}
     >
       {actual === "party" && (
@@ -1472,7 +1422,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             <select name="type">
               {Object.entries({
                 advertiser: "معلن",
-                master_concessionaire: "الشركة الوطنية",
+                master_concessionaire: "صاحب الامتياز",
                 authority: "جهة مالكة",
                 agency: "وكالة",
                 supplier: "مورد",
@@ -1494,9 +1444,11 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
       {actual === "asset" && (
         <>
-          <Field label="كود الأصل" name="code" />
-          <Select label="الشارع" name="street_id" rows={d.streets} />
-          <Select label="نوع الأصل" name="type_id" rows={d.assetTypes} />
+          <Field label="كود اللوحة" name="code" />
+          <LocationHierarchy d={d} initialStreet={initialStreet} />
+          <Select label="نوع اللوحة" name="type_id" rows={d.assetTypes} />
+          <LocationPicker value={assetPoint} onChange={setAssetPoint} center={assetCenter ? { latitude: Number(assetCenter.latitude), longitude: Number(assetCenter.longitude) } : undefined} />
+          <label>صورة اللوحة (اختياري)<input type="file" name="asset_photo" accept="image/png,image/jpeg,image/webp" /><small>حتى 2 ميجابايت. يمكنك رفع صور إضافية من بطاقة اللوحة بعد حفظه؛ الصور خاصة بالشركة.</small></label>
           <div className="form-grid">
             <Field
               label="الطول (م)"
@@ -1520,28 +1472,14 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
               value="1"
             />
             <Field label="المعدن" name="material" required={false} />
-            <Field
-              label="خط العرض"
-              name="latitude"
-              type="number"
-              step="any"
-              required={false}
-            />
-            <Field
-              label="خط الطول"
-              name="longitude"
-              type="number"
-              step="any"
-              required={false}
-            />
           </div>
           <label className="check-label">
             <input type="checkbox" name="public_visible" />
-            عرض هذا الأصل في موقع الشركة العام
+            عرض هذه اللوحة في موقع الشركة العام
           </label>
           <div className="form-grid">
             <Field
-              label="تكلفة اقتناء الأصل"
+              label="تكلفة شراء أو تصنيع اللوحة"
               name="cost"
               type="number"
               min="0"
@@ -1567,7 +1505,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       {actual === "contract" && (
         <>
           <div className="notice">
-            يفحص النظام تغطية العقد الصاعد ويمنع الحجز المزدوج قبل حفظ العقد
+            يفحص النظام صلاحية تصاريح اللوحات وتغطية حق الاستغلال ويمنع الحجز المزدوج قبل حفظ العقد
             بالكامل.
           </div>
           <Select
@@ -1575,33 +1513,14 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             name="customer_id"
             rows={d.parties.filter((p) => p.type === "advertiser")}
           />
-          <Field label="مرجع العقد" name="ref_no" />
-          <div className="form-grid">
-            <Field label="تاريخ البداية" name="start_date" type="date" />
-            <Field label="تاريخ النهاية (شامل)" name="end_date" type="date" />
-          </div>
-          <Select
-            label="الأصول"
-            name="asset_id"
-            rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({
-              id: a.id,
-              name: `${a.code} · ${a.street_name}`,
-            }))}
-            multiple
-          />
-          <Field
-            label="الإيجار الشهري لكل أصل (ج.م)"
-            name="monthly_price"
-            type="number"
-            min="0"
-            step="0.01"
-          />
+          <Field label="رقم العقد" name="ref_no" />
+          <ContractBookingFields data={d} />
           {d.profile.role === "admin" && (
             <label>
-              سبب الاستثناء من التغطية (اختياري)
+              سبب الاستثناء من حق الاستغلال فقط (اختياري)
               <textarea
                 name="override_reason"
-                placeholder="اتركه فارغًا للتطبيق العادي. الاستثناء يُسجل باسمك."
+                placeholder="الاستثناء يُسجل باسمك، ولا يسمح بتجاوز صلاحية تصريح اللوحة."
                 minLength={10}
               />
             </label>
@@ -1622,13 +1541,9 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       {actual === "street" && (
         <>
           <Field label="اسم الشارع" name="name" />
-          <Select
-            label="المنطقة / الحي"
-            name="district_id"
-            rows={d.districts}
-          />
+          <DistrictFields d={d} />
           <label>
-            نطاق الاستغلال
+            نطاق التعاقد
             <select name="holding">
               <option value="partial">مواقع متفرقة</option>
               <option value="full">الشارع بالكامل</option>
@@ -1652,6 +1567,7 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
       {actual === "payment" && (
         <>
+          <PaymentMethodField onChange={setPaymentMethod} />
           <input type="hidden" name="invoice_id" value={invoice?.id || ""} />
           <div className="notice">
             الفاتورة {invoice?.ref_no} · المتبقي{" "}
@@ -1673,25 +1589,27 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
               name: `${c.name} · ${money(c.balance)}`,
             }))}
           />
-          <Field label="مرجع الدفع" name="reference" required={false} />
+          <Field label="مرجع التحويل / الإيصال" name="reference" required={["bank_transfer","instapay","vodafone_cash","card"].includes(paymentMethod)} />
         </>
       )}
       {actual === "invoice" && <ItemizedInvoiceFields data={d} />}
       {actual === "license" && (
         <>
           <Select
-            label="الأصل"
+            label="اللوحات المشمولة بالتصريح"
             name="asset_id"
+            multiple
             rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({ id: a.id, name: a.code }))}
           />
           <Field label="رقم الترخيص" name="ref_no" />
           <Field label="جهة الإصدار" name="issuer" />
+          <Field label="بداية صلاحية التصريح" name="valid_from" type="date" />
           <Field label="تاريخ الانتهاء" name="expires_on" type="date" />
         </>
       )}
       {actual === "upstream" && (
         <>
-          <Field label="مرجع العقد" name="ref_no" />
+          <Field label="رقم العقد" name="ref_no" />
           <Select
             label="الجهة المالكة"
             name="grantor_party_id"
@@ -1699,14 +1617,14 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             rows={d.parties.filter((p) => p.type === "authority")}
           />
           <Select
-            label="صاحب حق الاستغلال (الوطنية)"
+            label="صاحب الامتياز (إن وجد)"
             name="master_party_id"
             required={false}
             rows={d.parties.filter((p) => p.type === "master_concessionaire")}
           />
           <p className="subtle">
             اختر طرفًا واحدًا على الأقل لربط مستحقات وأقساط العقد بالجهة
-            الصحيحة.
+            الصحيحة. صاحب الامتياز هو الشركة الحاصلة على حق استغلال المواقع، مثل الوطنية، إن كان التعاقد يتم من خلالها.
           </p>
           <div className="form-grid">
             <Field label="البداية" name="start_date" type="date" />
@@ -1728,13 +1646,13 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
             step="0.01"
           />
           <Select
-            label="الأصول المشمولة"
+            label="اللوحات المشمولة"
             name="asset_id"
             rows={d.assets.filter((a) => a.live_status !== "retired").map((a) => ({ id: a.id, name: a.code }))}
             multiple
           />
           <Field
-            label="التكلفة الشهرية المخصصة لكل أصل محدد (ج.م)"
+            label="التكلفة الشهرية المخصصة لكل لوحة محددة (ج.م)"
             name="monthly_cost"
             type="number"
             min="0"
@@ -1747,4 +1665,9 @@ function CreateForm({ kind, d }: { kind: string; d: WorkspaceData }) {
       )}
     </DataForm>
   );
+}
+
+function DistrictFields({ d }: { d: WorkspaceData }) {
+  const [governorate, setGovernorate] = useState("");
+  return <><label>المحافظة<select required value={governorate} onChange={e => setGovernorate(e.target.value)}><option value="">اختر المحافظة</option>{d.governorates.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label><Select key={governorate} label="المنطقة / الحي" name="district_id" rows={d.districts.filter(x => x.governorate_id === governorate)} /></>;
 }

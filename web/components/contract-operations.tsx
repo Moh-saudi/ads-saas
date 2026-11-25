@@ -35,7 +35,7 @@ export function ContractOperations({
     <>
       <Panel
         title={
-          upstream ? "جدول مستحقات العقود الصاعدة" : "جدول دفعات عقود المعلنين"
+          upstream ? "جدول مستحقات عقود استغلال المواقع" : "جدول دفعات عقود المعلنين"
         }
         subtitle="تُدخل المبالغ والمواعيد المعتمدة صراحةً؛ فوترة القسط لا تعني تحصيله"
         action={
@@ -129,7 +129,7 @@ export function ContractOperations({
               <h3>{detail?.ref_no}</h3>
               <GridTable
                 columns={[
-                  "الأصل",
+                  "اللوحة",
                   "البداية",
                   "النهاية",
                   "الإيجار الشهري",
@@ -197,7 +197,7 @@ export function ContractOperations({
                   {upstream ? (
                     <Pick
                       name="party_id"
-                      label="الطرف المستحق (الوطنية)"
+                      label="الجهة المستحق لها الدفع"
                       options={d.parties.filter((p) =>
                         ["master_concessionaire", "authority"].includes(p.type),
                       )}

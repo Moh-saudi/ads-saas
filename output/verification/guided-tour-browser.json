@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1440,
+    "passed": [
+      "launch from guide",
+      "navigation to actual screen",
+      "create button highlighted",
+      "opens real form with demo saving disabled",
+      "next and previous destinations",
+      "close tour",
+      "no horizontal overflow"
+    ]
+  },
+  {
+    "width": 390,
+    "passed": [
+      "launch from guide",
+      "navigation to actual screen",
+      "create button highlighted",
+      "opens real form with demo saving disabled",
+      "next and previous destinations",
+      "close tour",
+      "no horizontal overflow"
+    ]
+  }
+]

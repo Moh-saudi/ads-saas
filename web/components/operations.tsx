@@ -1,4 +1,6 @@
 "use client";
+import { BookingCalendar } from "./booking-calendar";
+import { paymentMethodLabel } from "@/lib/payment-methods.mjs";
 import { useState, useMemo, useEffect } from "react";
 import {
   Users,
@@ -58,19 +60,19 @@ export const operationNavigation = [
   },
   {
     id: "maintenance",
-    label: "الصيانة وأوامر العمل",
+    label: "التركيب والصيانة",
     icon: Wrench,
     module: "maintenance",
   },
   {
     id: "inspections",
-    label: "الفحص الميداني والوسوم",
+    label: "المتابعة الميدانية",
     icon: ClipboardCheck,
     module: "inspections",
   },
   {
     id: "cashbook",
-    label: "الخزينة والمصروفات",
+    label: "الخزينة والبنوك",
     icon: Landmark,
     module: "cashbook",
   },
@@ -86,8 +88,8 @@ export const operationNavigation = [
     icon: MessageCircle,
     module: "whatsapp",
   },
-  { id: "leads", label: "طلبات موقع الشركة", icon: Inbox, module: "leads" },
-  { id: "audit", label: "سجل المراجعة", icon: History, module: "audit" },
+  { id: "leads", label: "طلبات العملاء", icon: Inbox, module: "leads" },
+  { id: "audit", label: "سجل التعديلات", icon: History, module: "audit" },
 ];
 export type OperationModal = { kind: string; id?: string; tag?: string };
 export function Operations({
@@ -475,7 +477,7 @@ export function Operations({
                   "إلى",
                   "الكمية",
                   "التكلفة",
-                  "الأصل / أمر العمل",
+                  "اللوحة / أمر العمل",
                 ]}
                 rows={o.stockMoves
                   .filter((r) => matches({ ...r, name: item(r.item_id) }))
@@ -522,10 +524,10 @@ export function Operations({
           {tab === "items" && (
             <Panel title="دليل المعدات والخامات">
               <GridTable
-                columns={["SKU", "الصنف", "الوحدة", "حد إعادة الطلب"]}
+                columns={["SKU", "الصنف", "المقاس (م)", "الخامة", "الوحدة", "حد إعادة الطلب"]}
                 rows={o.items
                   .filter(matches)
-                  .map((i) => [i.sku, i.name, i.unit, fmt(i.reorder_level)])}
+                  .map((i) => [i.sku, i.name, i.length_m && i.width_m ? `${i.length_m} × ${i.width_m}` : "غير مسجل", i.material || "—", i.unit, fmt(i.reorder_level)])}
               />
             </Panel>
           )}
@@ -534,16 +536,17 @@ export function Operations({
       {section === "purchases" && (
         <>
           {tools(
-            stock && <Add onClick={() => open("purchase")}>أمر شراء جديد</Add>,
+            stock && <Add onClick={() => open("purchase")}>طلب شراء / تصنيع</Add>,
           )}
           <Panel
-            title="أوامر الشراء والتوريد"
+            title="طلبات الشراء والتصنيع لدى الموردين"
             subtitle="الاستلام يزيد المخزون، ثم تُنشأ فاتورة المورد من الأمر نفسه مرة واحدة"
           >
             <GridTable
               columns={[
                 "المرجع",
                 "المورد",
+                "الغرض / اللوحة",
                 "المخزن",
                 "تاريخ الطلب",
                 "القيمة",
@@ -553,6 +556,7 @@ export function Operations({
               rows={o.purchases.filter(matches).map((p) => [
                 p.ref_no,
                 d.parties.find((a) => a.id === p.supplier_id)?.name || "—",
+                `${p.procurement_kind === "external_manufacture" ? "تصنيع لدى المورد" : "شراء"} · ${asset(p.asset_id || null)}`,
                 warehouse(p.warehouse_id),
                 date(p.ordered_on),
                 egp(
@@ -580,6 +584,7 @@ export function Operations({
       )}
       {section === "maintenance" && (
         <>
+          <BookingCalendar data={d} />
           <div className="ops-metrics">
             <Mini
               label="أوامر مفتوحة"
@@ -616,7 +621,7 @@ export function Operations({
             <GridTable
               columns={[
                 "المرجع / المهمة",
-                "الأصل",
+                "اللوحة",
                 "المسؤول",
                 "الموعد",
                 "الأولوية",
@@ -655,23 +660,23 @@ export function Operations({
                   className="button secondary"
                   onClick={() => open("asset_tag")}
                 >
-                  ربط وسم QR / NFC
+                  ربط كود تعريف QR / NFC
                 </button>
               )}
             </>,
           )}
           {tabs([
             { id: "main", label: "سجل الفحص" },
-            { id: "tags", label: "وسوم الأصول" },
+            { id: "tags", label: "أكواد تعريف اللوحات" },
           ])}
           {tab === "main" ? (
             <Panel
               title="الزيارات والفحص الميداني"
-              subtitle="النتائج غير السليمة تسجل حادثًا على الأصل للمراجعة"
+              subtitle="النتائج غير السليمة تسجل حادثًا على اللوحة للمراجعة"
             >
               <GridTable
                 columns={[
-                  "الأصل",
+                  "اللوحة",
                   "تاريخ الزيارة",
                   "الحالة",
                   "طريقة التحقق",
@@ -690,11 +695,11 @@ export function Operations({
             </Panel>
           ) : (
             <Panel
-              title="الوسوم وربطها بالأصول"
+              title="أكواد التعريف وربطها باللوحات"
               subtitle="QR يعمل على جميع الهواتف عبر رابط الفحص؛ قراءة NFC حسب دعم المتصفح والجهاز"
             >
               <GridTable
-                columns={["الأصل", "النوع", "معرف الوسم", "الحالة", ""]}
+                columns={["اللوحة", "النوع", "رقم كود التعريف", "الحالة", ""]}
                 rows={o.assetTags.filter(matches).map((t) => [
                   asset(t.asset_id),
                   t.kind.toUpperCase(),
@@ -757,13 +762,13 @@ export function Operations({
                 </>,
               )}
               {tabs([
-                { id: "main", label: "دفتر النقدية" },
+                { id: "main", label: "حركات الخزينة والبنك" },
                 { id: "journal", label: "القيود اليومية" },
                 { id: "accounts", label: "دليل الحسابات" },
               ])}
               {tab === "main" && (
                 <Panel
-                  title="دفتر الخزائن والبنوك"
+                  title="حركات الخزائن والبنوك"
                   subtitle="الفواتير تُثبت الاستحقاق؛ المقبوضات والمدفوعات تُثبت حركة النقدية"
                 >
                   <GridTable
@@ -773,6 +778,7 @@ export function Operations({
                       "الخزينة / البنك",
                       "النوع",
                       "البيان",
+                      "طريقة العملية",
                       "القيمة",
                     ]}
                     rows={o.cashTransactions
@@ -796,6 +802,7 @@ export function Operations({
                           } as Record<string, string>
                         )[t.kind],
                         t.description,
+                        paymentMethodLabel(t.payment_method),
                         egp(t.amount),
                       ])}
                   />
@@ -945,7 +952,7 @@ export function Operations({
               columns={[
                 "الاسم",
                 "التواصل",
-                "الأصل",
+                "اللوحة",
                 "الطلب",
                 "الحالة",
                 "التاريخ",
@@ -994,7 +1001,7 @@ export function Operations({
                 </button>,
               )}
               <Panel
-                title="سجل المراجعة"
+                title="سجل التعديلات"
                 subtitle="تسجيل تلقائي للتغييرات والمستخدم وتوقيتها؛ السجل غير قابل للتعديل من التطبيق"
               >
                 <GridTable
@@ -1019,7 +1026,7 @@ export function Operations({
               </Panel>
             </>
           ) : (
-            <div className="notice">سجل المراجعة متاح لمدير النظام.</div>
+            <div className="notice">سجل التعديلات متاح لمدير النظام.</div>
           )}
         </>
       )}
@@ -1029,7 +1036,7 @@ export function Operations({
             modal.kind.endsWith("_detail")
               ? "تفاصيل السجل"
               : modal.kind === "qr_preview"
-                ? "وسم الأصل"
+                ? "كود تعريف اللوحة"
                 : "إدارة السجل"
           }
           onClose={() => setModal(null)}

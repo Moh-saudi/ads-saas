@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
+import { resolveWebsiteContent } from "../web/lib/website-content.mjs";
+import { checkPlaceRendering } from "./test-website-render.mjs";
 export async function testWebsite({db,sql,as,ok,rejects,t1,t2,admin,viewer,other}) {
  await as(admin);
+ const brand={name:"Review agency",primary_color:"#123456",website_description:"Company description"};
+ await ok("empty saved website places remain empty instead of restoring defaults",async()=>{
+  assert.deepEqual(resolveWebsiteContent(brand,{places:[]},["Cairo"]).places,[]);
+  assert.equal(resolveWebsiteContent(brand,{},["Cairo"]).places[0].name,"Cairo");
+  assert.equal(resolveWebsiteContent(brand,null,["Cairo"]).places[0].name,"Cairo");
+ });
+ await ok("public website renders missing and blank place images with a labelled fallback",async()=>checkPlaceRendering(brand));
  const content={about_title:"Original agency",about_text:"Verified company presentation",slides:[{title:"A campaign",accent:"A bigger presence",image_url:"/media/agency/city-night.webp"}],partners:[{name:"Local test partner",logo_url:"https://example.com/logo.png",website:"https://example.com"}]};
  await ok("company admin can save its own website content",async()=>{
   await sql("insert into tenant_website(tenant_id,content) values($1,$2)",[t1,JSON.stringify(content)]);
@@ -37,4 +46,10 @@ export async function testWebsite({db,sql,as,ok,rejects,t1,t2,admin,viewer,other
  await as(viewer);
  await rejects("non-admin cannot upload website media",`insert into storage.objects(bucket_id,name) values('tenant-website','${t1}/viewer.webp')`,/row-level security/);
  await as(admin);
+ await ok("public website preserves explicitly cleared places after database persistence",async()=>{
+  await sql("update tenant_website set content=jsonb_set(content,'{places}','[]'::jsonb) where tenant_id=$1",[t1]);
+  const row=(await sql("select public_website('a.test') site")).rows[0].site;
+  assert.deepEqual(row.content.places,[]);
+  assert.deepEqual(resolveWebsiteContent(brand,row.content,row.areas).places,[]);
+ });
 }

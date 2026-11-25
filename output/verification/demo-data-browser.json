@@ -1,0 +1,126 @@
+{
+  "checks": [
+    {
+      "width": 1440,
+      "section": "dashboard",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "assets",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "contracts",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "upstream",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "customers",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "geography",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "finance",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "licenses",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "employees",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "attendance",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "payroll",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "inventory",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "purchases",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "maintenance",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "inspections",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "cashbook",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "reports",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "whatsapp",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "leads",
+      "rendered": true
+    },
+    {
+      "width": 1440,
+      "section": "audit",
+      "rendered": true
+    },
+    {
+      "width": 390,
+      "section": "dashboard",
+      "rendered": true
+    },
+    {
+      "width": 390,
+      "section": "contracts",
+      "rendered": true
+    },
+    {
+      "width": 390,
+      "section": "licenses",
+      "rendered": true
+    },
+    {
+      "width": 390,
+      "section": "inventory",
+      "rendered": true
+    }
+  ],
+  "invoice": "supplier invoice rendered",
+  "limitations": "fixture data; map tiles blocked; no hosted writes"
+}

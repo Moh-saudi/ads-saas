@@ -20,6 +20,7 @@ export function operationsDemo(): OperationsData {
       email: "field@example.com",
       hire_date: "2025-03-01",
       base_salary: 9000,
+      profile_id: "user1",
     },
     {
       id: "e2",
@@ -33,6 +34,7 @@ export function operationsDemo(): OperationsData {
       email: "finance@example.com",
       hire_date: "2025-07-01",
       base_salary: 12000,
+      profile_id: "user2",
     },
     {
       id: "e3",
@@ -46,14 +48,16 @@ export function operationsDemo(): OperationsData {
       email: null,
       hire_date: "2026-01-01",
       base_salary: 8500,
+      profile_id: "user3",
     },
   ];
   const accounts = [
     ["1000", "الخزينة النقدية", "asset"],
     ["1010", "الحساب البنكي", "asset"],
-    ["1100", "ذمم المعلنين", "asset"],
+    ["1020", "محفظة فودافون كاش", "asset"],
+    ["1100", "حسابات العملاء — المعلنين", "asset"],
     ["1400", "مخزون المعدات", "asset"],
-    ["2000", "ذمم الموردين", "liability"],
+    ["2000", "حسابات الموردين", "liability"],
     ["2100", "رواتب مستحقة", "liability"],
     ["3000", "حقوق الملكية", "equity"],
     ["4000", "إيراد الإعلانات", "revenue"],
@@ -91,11 +95,24 @@ export function operationsDemo(): OperationsData {
         asset_id: kind === "expense" ? "a0" : null,
         work_order_id: kind === "expense" ? "w1" : null,
       });
-    add("receipt", 76000 + (5 - m) * 6500, "gl4000", 1);
+    add("receipt", m === 0 ? 18000 : 76000 + (5 - m) * 6500, "gl4000", 1);
+    if (m === 0) cashTransactions[cashTransactions.length - 1].description = "تحصيل جزئي لفاتورة INV-001 — عميل تجريبي ١";
     add("expense", 17000 + (m % 3) * 3200, "gl5000", 2);
-    add("salary", 29500, "gl5100", 3);
+    add("salary", m === 0 ? 8500 : 29500, "gl5100", 3);
+    if (m === 0) cashTransactions[cashTransactions.length - 1].description = "صرف راتب حسن محمد";
     add("expense", 3500 + (m % 2) * 1700, "gl5200", 4);
+    if (m === 0) {
+      add("payment", 36000, "gl5000", 5);
+      cashTransactions[cashTransactions.length - 1].description = "سداد استحقاق الجهة المالكة — PAY-001";
+      cashTransactions[cashTransactions.length - 1].asset_id = null;
+      cashTransactions[cashTransactions.length - 1].work_order_id = null;
+    }
   }
+  const receiptIndex=cashTransactions.findIndex(t=>t.kind==='receipt'&&t.transaction_date.startsWith(today.slice(0,7)));
+  const template=cashTransactions[receiptIndex];
+  cashTransactions.splice(receiptIndex,1,...[
+    ['cash',4000,'cash1'],['bank_transfer',5000,'cash2'],['instapay',3000,'cash2'],['vodafone_cash',3500,'cash3'],['card',2500,'cash2']
+  ].map(([method,amount,cash],i)=>({...template,id:`collection-${i}`,ref_no:`RCPT-00${i+1}`,amount:Number(amount),cash_account_id:String(cash),payment_method:String(method),description:'تحصيل جزئي لفاتورة INV-001 — عميل تجريبي ١'})));
   const cashflow = Array.from(
     new Set(cashTransactions.map((t) => t.transaction_date.slice(0, 7))),
   )
@@ -120,7 +137,7 @@ export function operationsDemo(): OperationsData {
     {
       id: `jl${t.id}a`,
       entry_id: `j${t.id}`,
-      account_id: "gl1000",
+      account_id: t.cash_account_id === "cash2" ? "gl1010" : t.cash_account_id === "cash3" ? "gl1020" : "gl1000",
       debit: t.kind === "receipt" ? t.amount : 0,
       credit: t.kind === "receipt" ? 0 : t.amount,
     },
@@ -140,6 +157,7 @@ export function operationsDemo(): OperationsData {
   });
   return {
     ...emptyOperations,
+    tenantUsers: [{id:"demo",full_name:"أحمد محمود",role:"admin"},{id:"user1",full_name:"محمود علي",role:"supervisor"},{id:"user2",full_name:"سارة أحمد",role:"accountant"},{id:"user3",full_name:"حسن محمد",role:"storekeeper"}],
     employees,
     employeeDirectory: employees,
     accounts,
@@ -149,6 +167,7 @@ export function operationsDemo(): OperationsData {
     journalLines,
     trialBalance,
     installments: [
+      {id:"ins2",customer_contract_id:null,upstream_contract_id:"u1",party_id:"authority1",ref_no:"UP-INST-001",due_date:day(20),amount:39600,invoice_id:null},
       {
         id: "ins1",
         customer_contract_id: "c1",
@@ -181,6 +200,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     cashAccounts: [
+      {id:"cash3",name:"محفظة فودافون كاش",kind:"cash",ledger_account_id:"gl1020",balance:trialBalance.find(a=>a.code==="1020")!.balance,allow_overdraft:false},
       {
         id: "cash1",
         name: "الخزينة الرئيسية",
@@ -194,7 +214,7 @@ export function operationsDemo(): OperationsData {
         name: "حساب البنك",
         kind: "bank",
         ledger_account_id: "gl1010",
-        balance: 0,
+        balance: trialBalance.find(a=>a.code==="1010")!.balance,
         allow_overdraft: false,
       },
     ],
@@ -304,6 +324,9 @@ export function operationsDemo(): OperationsData {
       },
     ],
     stockMoves: [
+      {id:"sm3",ref_no:"ST-IN-002",item_id:"it2",from_warehouse_id:null,to_warehouse_id:"wh1",quantity:24,unit_cost:180,kind:"receipt",asset_id:null,work_order_id:null,notes:"استلام بنر مطبوع",created_at:day(-5)+"T08:00:00Z",return_of:null},
+      {id:"sm4",ref_no:"ST-IN-003",item_id:"it3",from_warehouse_id:null,to_warehouse_id:"wh2",quantity:20,unit_cost:400,kind:"receipt",asset_id:null,work_order_id:null,notes:"استلام كشافات",created_at:day(-5)+"T08:00:00Z",return_of:null},
+      {id:"sm5",ref_no:"ST-OUT-002",item_id:"it3",from_warehouse_id:"wh2",to_warehouse_id:null,quantity:2,unit_cost:400,kind:"issue",asset_id:"a8",work_order_id:"w3",notes:"تركيب إضاءة الحملة",created_at:day(-2)+"T08:00:00Z",return_of:null},
       {
         id: "sm1",
         ref_no: "ST-IN-001",
@@ -336,6 +359,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     purchases: [
+      {id:"po2",ref_no:"PO-002",supplier_id:"supplier1",warehouse_id:"wh2",ordered_on:day(-8),expected_on:day(-5),status:"received",notes:"استلمت كشافات إضاءة الحملة"},
       {
         id: "po1",
         ref_no: "PO-001",
@@ -348,6 +372,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     purchaseLines: [
+      {id:"pl3",purchase_id:"po2",item_id:"it3",quantity:20,unit_cost:400},
       {
         id: "pl1",
         purchase_id: "po1",
@@ -364,6 +389,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     workOrders: [
+      {id:"w3",ref_no:"WO-003",asset_id:"a8",title:"تركيب خامة حملة العميل التجريبي ٢ وإضاءتها",description:"تركيب كشافين وفحص الإضاءة",assigned_employee_id:"e1",priority:"normal",status:"completed",due_date:day(-2),completed_at:day(-2)+"T14:00:00Z",resolution:"تم التركيب وفحص الإضاءة وتسليم الموقع"},
       {
         id: "w1",
         ref_no: "WO-001",
@@ -416,6 +442,7 @@ export function operationsDemo(): OperationsData {
       paid_on: i === 2 ? today : null,
     })),
     enquiries: [
+      {id:"lead2",full_name:"عميل تجريبي ٢",phone:"01100000000",email:"elite@example.com",message:"طلب حملة على طريق السويس لمدة شهرين",asset_code:"MD-0109",status:"contacted",notes:"تم التواصل لإعداد العرض",created_at:day(-2)+"T09:00:00Z"},
       {
         id: "lead1",
         full_name: "عميل تجريبي",
@@ -442,6 +469,7 @@ export function operationsDemo(): OperationsData {
       },
     ],
     audit: [
+      {id:"aud2",actor_id:"user1",table_name:"assets",record_id:"a8",operation:"ASSET_LOCATION",created_at:day(-2)+"T10:00:00Z",changes:{reason:"تأكيد نقطة التركيب الميداني",after:{latitude:30.131,longitude:31.633}}},
       {
         id: "aud1",
         actor_id: "demo",

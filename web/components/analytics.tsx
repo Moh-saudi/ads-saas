@@ -1,4 +1,6 @@
 "use client";
+import { AssetProfitability } from "./pricing-profitability";
+import { CollectionChart } from "./collection-chart";
 import { useMemo, useState } from "react";
 import { ArrowDownToLine } from "lucide-react";
 import type { WorkspaceData } from "@/lib/types";
@@ -38,12 +40,13 @@ export function Analytics({
   const maximum = Math.max(1, ...series.flatMap((x) => [x.income, x.expense])),
     totalIncome = series.reduce((s, r) => s + r.income, 0),
     totalExpense = series.reduce((s, r) => s + r.expense, 0);
+  const streetDistrict = new Map(d.streets.map((street) => [street.id, street.district_id]));
   const districts = d.districts.map((x) => ({
     name: x.name,
-    total: d.assets.filter((a) => a.district_name === x.name && a.live_status !== "retired").length,
+    total: d.assets.filter((a) => streetDistrict.get(a.street_id) === x.id && a.live_status !== "retired").length,
     leased: d.assets.filter(
       (a) =>
-        a.district_name === x.name &&
+        streetDistrict.get(a.street_id) === x.id &&
         ["leased", "expiring"].includes(a.live_status),
     ).length,
   }));
@@ -58,6 +61,7 @@ export function Analytics({
   );
   return (
     <div className="analytics-area">
+      {full && <AssetProfitability data={d} />}
       <div className="analytics-toolbar">
         <div>
           <h2>{full ? "تقارير الأعمال والأداء" : "أداء أعمالك بالأرقام"}</h2>
@@ -114,6 +118,7 @@ export function Analytics({
           />
         </div>
       )}
+      {roleFinance && <CollectionChart rows={d.operations.cashTransactions} start={series[0].key+'-01'} />}
       <div className="analytics-grid">
         {roleFinance && (
           <Panel
@@ -187,7 +192,7 @@ export function Analytics({
         )}
         <Panel
           title="الإشغال حسب المناطق"
-          subtitle="حالة الأصول الحالية ضمن نطاق صلاحياتك"
+          subtitle="حالة اللوحات الحالية ضمن نطاق صلاحياتك"
         >
           <div className="district-bars">
             {districts.map((r) => (
@@ -208,7 +213,7 @@ export function Analytics({
               </div>
             ))}
             {!districts.length && (
-              <p className="subtle">أضف المناطق والأصول لعرض التوزيع.</p>
+              <p className="subtle">أضف المناطق واللوحات لعرض التوزيع.</p>
             )}
           </div>
           <div className="analytics-ops">

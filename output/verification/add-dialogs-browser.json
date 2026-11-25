@@ -1,0 +1,128 @@
+[
+  {
+    "width": 1440,
+    "section": "assets",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 1440,
+    "section": "customers",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 1440,
+    "section": "contracts",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 1440,
+    "section": "finance",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 1440,
+    "section": "licenses",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 1440,
+    "section": "employees",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 1440,
+    "section": "inventory",
+    "dialogWidth": 720,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "assets",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "customers",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "contracts",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "finance",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "licenses",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "employees",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  },
+  {
+    "width": 390,
+    "section": "inventory",
+    "dialogWidth": 366,
+    "noHorizontalOverflow": true,
+    "headingFixed": true,
+    "saveReachable": true,
+    "escapeCloses": true
+  }
+]
