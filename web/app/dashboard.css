@@ -11,7 +11,7 @@
   --bg: #f5f8f7;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-dashboard-latin), var(--font-dashboard-arabic), var(--font-tajawal), sans-serif;
+  font-family: var(--font-dashboard-latin), var(--font-tajawal), var(--font-dashboard-arabic), "Tajawal", sans-serif;
   font-variant-numeric: lining-nums tabular-nums;
 }
 .workspace h1,
@@ -24,8 +24,19 @@
 .workspace .topbar-title strong,
 .workspace .stat-value,
 .workspace .kpi-value,
-.workspace button.primary {
-  font-family: var(--font-cairo), sans-serif;
+.workspace .ops-metric strong,
+.workspace button.primary,
+.workspace .button.primary {
+  font-family: var(--font-cairo), "Cairo", sans-serif;
+}
+.workspace .sidebar nav,
+.workspace .nav-link,
+.workspace table,
+.workspace th,
+.workspace td,
+.workspace .data-form,
+.workspace .toolbar {
+  font-family: var(--font-dashboard-latin), var(--font-tajawal), var(--font-dashboard-arabic), "Tajawal", sans-serif;
 }
 .workspace .sidebar {
   background: #fff;

@@ -15,9 +15,12 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-size: 13px;
+  font-family: var(--font-tajawal), "Tajawal", system-ui, sans-serif;
+  font-size: 13.5px;
   line-height: 1.7;
 }
+
+/* Headings, Brand, & Primary Buttons — Cairo */
 h1,
 h2,
 h3,
@@ -29,8 +32,36 @@ h6,
 .agency-logo,
 .agency-hero h1,
 .agency-about h2,
-.agency-section-heading h2 {
-  font-family: var(--font-cairo), inherit;
+.agency-section-heading h2,
+.agency-statement,
+.card-head h2,
+.card-title,
+.modal-title,
+.eyebrow,
+.public-eyebrow,
+button.primary,
+.button.primary,
+.agency-nav-cta,
+.agency-pill {
+  font-family: var(--font-cairo), "Cairo", system-ui, sans-serif;
+}
+
+/* Body text, descriptions, inputs, tables, and nav — Tajawal */
+p,
+span,
+small,
+label,
+input,
+select,
+textarea,
+table,
+th,
+td,
+nav,
+.nav-link,
+.table-note,
+.card p {
+  font-family: var(--font-tajawal), "Tajawal", system-ui, sans-serif;
 }
 button,
 input,

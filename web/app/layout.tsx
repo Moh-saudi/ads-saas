@@ -9,14 +9,14 @@ import { shareMetadata, siteDescription } from "@/lib/share-metadata";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["600", "700", "800", "900"],
   variable: "--font-cairo",
   display: "swap",
 });
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["400", "500", "700"],
   variable: "--font-tajawal",
   display: "swap",
 });
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ar" dir="rtl">
       <body
-        className={`${cairo.className} ${cairo.variable} ${tajawal.variable} ${dashboardNumbers.variable}`}
+        className={`${tajawal.className} ${tajawal.variable} ${cairo.variable} ${dashboardNumbers.variable}`}
         style={{
           "--font-dashboard-latin": dashboardNumbers.style.fontFamily,
           "--font-dashboard-arabic": tajawal.style.fontFamily,
