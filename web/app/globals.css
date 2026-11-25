@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap");
+
 :root {
   --navy: #0b1f4d;
   --brand: #0b1f4d;
@@ -7,8 +9,10 @@
   --muted: #8490a3;
   --line: #edf0f5;
   --bg: #f6f8fb;
-  --font-heading: var(--font-cairo), "Cairo", system-ui, sans-serif;
-  --font-body: var(--font-tajawal), "Tajawal", system-ui, sans-serif;
+  --font-cairo-family: var(--font-cairo), "Cairo", system-ui, sans-serif;
+  --font-tajawal-family: var(--font-dashboard-arabic), "Tajawal", system-ui, sans-serif;
+  --font-heading: var(--font-cairo-family);
+  --font-body: var(--font-cairo-family);
   --font: var(--font-body);
 }
 * {
@@ -18,7 +22,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-body);
+  font-family: var(--font-cairo-family) !important;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -29,8 +33,12 @@ h4,
 h5,
 h6,
 .brand-lockup strong,
-.public-logo {
-  font-family: var(--font-heading);
+.public-logo,
+.agency-logo,
+.agency-hero h1,
+.agency-about h2,
+.agency-section-heading h2 {
+  font-family: var(--font-cairo-family) !important;
 }
 button,
 input,

@@ -9,6 +9,7 @@ import { shareMetadata, siteDescription } from "@/lib/share-metadata";
 
 const cairo = localFont({
   src: "./fonts/Cairo.ttf",
+  weight: "200 1000",
   variable: "--font-cairo",
   display: "swap",
 });
@@ -52,7 +53,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ar" dir="rtl">
       <body
-        className={`${cairo.variable} ${tajawal.className} ${tajawal.variable} ${dashboardNumbers.variable}`}
+        className={`${cairo.className} ${cairo.variable} ${tajawal.variable} ${dashboardNumbers.variable}`}
         style={{
           "--font-dashboard-latin": dashboardNumbers.style.fontFamily.split(",")[0],
           "--font-dashboard-arabic": tajawal.style.fontFamily.split(",")[0],
