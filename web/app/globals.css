@@ -7,7 +7,9 @@
   --muted: #8490a3;
   --line: #edf0f5;
   --bg: #f6f8fb;
-  --font: sans-serif;
+  --font-heading: var(--font-cairo), "Cairo", system-ui, sans-serif;
+  --font-body: var(--font-tajawal), "Tajawal", system-ui, sans-serif;
+  --font: var(--font-body);
 }
 * {
   box-sizing: border-box;
@@ -16,8 +18,19 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.7;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.brand-lockup strong,
+.public-logo {
+  font-family: var(--font-heading);
 }
 button,
 input,

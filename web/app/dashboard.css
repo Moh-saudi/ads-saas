@@ -11,8 +11,23 @@
   --bg: #f5f8f7;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-dashboard-numbers), var(--font-dashboard-arabic), sans-serif;
+  /* Use only Inter's primary face before Tajawal; an automatic Latin fallback
+     could otherwise consume Arabic glyphs before the selected Arabic font. */
+  font-family: var(--font-dashboard-latin), var(--font-tajawal), var(--font-dashboard-arabic), sans-serif;
   font-variant-numeric: lining-nums tabular-nums;
+}
+.workspace h1,
+.workspace h2,
+.workspace h3,
+.workspace h4,
+.workspace .card-head h2,
+.workspace .card-title,
+.workspace .brand-lockup strong,
+.workspace .topbar-title strong,
+.workspace .stat-value,
+.workspace .kpi-value,
+.workspace button.primary {
+  font-family: var(--font-cairo), var(--font-heading), sans-serif;
 }
 .workspace .sidebar {
   background: #fff;
@@ -164,7 +179,7 @@
 .workspace .ops-dialog, .workspace .modal { color: var(--text); }
 .workspace .empty { color: #718075; }
 .workspace .empty svg { color: #a0b7a8; }
-.workspace .leaflet-container { font-family: var(--font-dashboard-numbers), var(--font-dashboard-arabic), sans-serif !important; }
+.workspace .leaflet-container { font-family: var(--font-dashboard-latin), var(--font-dashboard-arabic), sans-serif !important; }
 .invoice-document { font-variant-numeric: lining-nums tabular-nums; }
 @media (min-width: 1201px) {
   .workspace .sidebar { width: 258px; }

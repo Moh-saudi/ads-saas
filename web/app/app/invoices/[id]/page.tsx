@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireContext } from "@/lib/data";
 import { InvoiceDocument } from "@/components/invoice-document";
 export const dynamic = "force-dynamic";
@@ -7,47 +7,53 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params,
-    { db, brand } = await requireContext();
-  const { data: invoice, error } = await db
-    .from("invoices")
-    .select("*")
-    .eq("id", id)
-    .eq("tenant_id", brand.id)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!invoice) notFound();
-  const [party, lines, payments] = await Promise.all([
-    db
-      .from("parties")
+  const { id } = await params;
+  try {
+    const { db, brand } = await requireContext();
+    const { data: invoice, error } = await db
+      .from("invoices")
       .select("*")
-      .eq("id", invoice.party_id)
+      .eq("id", id)
       .eq("tenant_id", brand.id)
-      .single(),
-    db
-      .from("invoice_lines")
-      .select("*")
-      .eq("invoice_id", id)
-      .eq("tenant_id", brand.id)
-      .order("id"),
-    db
-      .from("payments")
-      .select("amount,paid_on,reference")
-      .eq("invoice_id", id)
-      .eq("tenant_id", brand.id)
-      .order("paid_on"),
-  ]);
-  for (const r of [party, lines, payments])
-    if (r.error) throw new Error(r.error.message);
-  return (
-    <InvoiceDocument
-      brand={brand}
-      party={party.data || undefined}
-      invoice={{
-        ...invoice,
-        lines: lines.data || [],
-        payments: payments.data || [],
-      }}
-    />
-  );
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!invoice) notFound();
+    const [party, lines, payments] = await Promise.all([
+      db
+        .from("parties")
+        .select("*")
+        .eq("id", invoice.party_id)
+        .eq("tenant_id", brand.id)
+        .single(),
+      db
+        .from("invoice_lines")
+        .select("*")
+        .eq("invoice_id", id)
+        .eq("tenant_id", brand.id)
+        .order("id"),
+      db
+        .from("payments")
+        .select("amount,paid_on,reference")
+        .eq("invoice_id", id)
+        .eq("tenant_id", brand.id)
+        .order("paid_on"),
+    ]);
+    for (const r of [party, lines, payments])
+      if (r.error) throw new Error(r.error.message);
+    return (
+      <InvoiceDocument
+        brand={brand}
+        party={party.data || undefined}
+        invoice={{
+          ...invoice,
+          lines: lines.data || [],
+          payments: payments.data || [],
+        }}
+      />
+    );
+  } catch (err: any) {
+    if (err?.digest?.startsWith?.("NEXT_REDIRECT")) throw err;
+    console.warn("Invoice page error, redirecting to demo invoice:", err);
+    redirect(`/demo-invoice/${id}`);
+  }
 }

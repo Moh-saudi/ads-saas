@@ -14,19 +14,27 @@ export async function login(
   if (!configured)
     return {
       ok: false,
-      message: "أضف إعدادات Supabase أولاً من صفحة الإعداد.",
+      message: "أضف إعدادات Supabase أولاً من صفحة الإعداد أو جرب وضع المعاينة /demo.",
     };
-  const db = await createClient();
-  const { error } = await db.auth.signInWithPassword({
-    email: String(form.get("email") || "").trim(),
-    password: String(form.get("password") || ""),
-  });
-  if (error)
+  try {
+    const db = await createClient();
+    const { error } = await db.auth.signInWithPassword({
+      email: String(form.get("email") || "").trim(),
+      password: String(form.get("password") || ""),
+    });
+    if (error)
+      return {
+        ok: false,
+        message: "تعذر تسجيل الدخول. إذا كانت قاعدة البيانات متوقفة مؤقتاً، يرجى استئنافها من لوحة Supabase، أو تجربة وضع المعاينة /demo.",
+      };
+    redirect("/app/dashboard");
+  } catch (err: any) {
+    if (err?.digest?.startsWith?.("NEXT_REDIRECT")) throw err;
     return {
       ok: false,
-      message: "تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور وتفعيل الحساب.",
+      message: "تعذر الاتصال بقاعدة البيانات حالياً (قد تكون متوقفة مؤقتاً). يمكنك تجربة المنصة عبر وضع المعاينة /demo.",
     };
-  redirect("/app/dashboard");
+  }
 }
 export async function logout() {
   const db = await createClient();
